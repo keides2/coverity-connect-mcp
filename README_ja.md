@@ -2,8 +2,8 @@
 
 <img src="top.png" alt="Coverity Connect MCP Server" width="700">
 
-[![PyPI version](https://badge.fury.io/py/coverity-connect-mcp.svg)](https://badge.fury.io/py/coverity-connect-mcp)
-[![Python Support](https://img.shields.io/pypi/pyversions/coverity-connect-mcp.svg)](https://pypi.org/project/coverity-connect-mcp/)
+<!-- [![PyPI version](https://badge.fury.io/py/coverity-connect-mcp.svg)](https://badge.fury.io/py/coverity-connect-mcp) -->
+<!-- [![Python Support](https://img.shields.io/pypi/pyversions/coverity-connect-mcp.svg)](https://pypi.org/project/coverity-connect-mcp/) -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/keides2/coverity-connect-mcp/workflows/Tests/badge.svg)](https://github.com/keides2/coverity-connect-mcp/actions)
 [![Coverage](https://codecov.io/gh/keides2/coverity-connect-mcp/branch/main/graph/badge.svg)](https://codecov.io/gh/keides2/coverity-connect-mcp)
@@ -38,21 +38,52 @@ AIアシスタント（Claude Desktopなど）と**Black Duck Coverity Connect**
 
 ## 📦 インストール
 
-### pipを使用（推奨）
+> ⚠️ **注意**: このパッケージはまだPyPIやDocker Hubに公開されていません。公式パッケージがリリースされるまでは、ソースからのインストール方法をご利用ください。
+
+### 現在のインストール方法（推奨）
+```bash
+# リポジトリをクローン
+git clone https://github.com/keides2/coverity-connect-mcp.git
+cd coverity-connect-mcp
+
+# 開発モードでインストール
+pip install -e .
+```
+
+### 代替方法: GitHubから直接インストール
+```bash
+# GitHubから直接インストール
+pip install git+https://github.com/keides2/coverity-connect-mcp.git
+```
+
+### 今後のインストール方法
+
+パッケージが公開されると、以下のインストール方法が利用可能になります：
+
+#### PyPIからのインストール（近日公開予定）
 ```bash
 pip install coverity-connect-mcp
 ```
 
-### Dockerを使用
+#### Dockerでのインストール（近日公開予定）
 ```bash
 docker pull keides2/coverity-connect-mcp:latest
 ```
 
-### ソースから
+### 開発用インストール
+
+開発目的の場合：
+
 ```bash
 git clone https://github.com/keides2/coverity-connect-mcp.git
 cd coverity-connect-mcp
-pip install -e .
+
+# 仮想環境を作成
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# 開発依存関係と一緒にインストール
+pip install -e ".[dev]"
 ```
 
 ## ⚙️ 設定
@@ -99,12 +130,16 @@ export PROXY_PASS="プロキシパスワード"  # 認証が必要な場合
 ```
 
 ### 3. Docker設定
+
+> **注意**: Dockerイメージはまだ公開されていないため、ローカルでビルドできます：
+
 ```yaml
 # docker-compose.yml
 version: '3.8'
 services:
   coverity-mcp:
-    image: keides2/coverity-connect-mcp:latest
+    build: .  # ローカルソースからビルド
+    # 将来: image: keides2/coverity-connect-mcp:latest
     environment:
       - COVAUTHUSER=${COVAUTHUSER}
       - COVAUTHKEY=${COVAUTHKEY}

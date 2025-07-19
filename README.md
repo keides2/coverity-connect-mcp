@@ -2,8 +2,8 @@
 
 <img src="top.png" alt="Coverity Connect MCP Server" width="700">
 
-[![PyPI version](https://badge.fury.io/py/coverity-connect-mcp.svg)](https://badge.fury.io/py/coverity-connect-mcp)
-[![Python Support](https://img.shields.io/pypi/pyversions/coverity-connect-mcp.svg)](https://pypi.org/project/coverity-connect-mcp/)
+<!-- [![PyPI version](https://badge.fury.io/py/coverity-connect-mcp.svg)](https://badge.fury.io/py/coverity-connect-mcp) -->
+<!-- [![Python Support](https://img.shields.io/pypi/pyversions/coverity-connect-mcp.svg)](https://pypi.org/project/coverity-connect-mcp/) -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/keides2/coverity-connect-mcp/workflows/Tests/badge.svg)](https://github.com/keides2/coverity-connect-mcp/actions)
 [![Coverage](https://codecov.io/gh/keides2/coverity-connect-mcp/branch/main/graph/badge.svg)](https://codecov.io/gh/keides2/coverity-connect-mcp)
@@ -38,21 +38,52 @@ Transform your Coverity workflow with natural language commands and automated an
 
 ## 📦 Installation
 
-### Using pip (Recommended)
+> ⚠️ **Note**: This package is not yet published to PyPI or Docker Hub. Please use the source installation method until official packages are released.
+
+### Current Installation Method (Recommended)
+```bash
+# Clone the repository
+git clone https://github.com/keides2/coverity-connect-mcp.git
+cd coverity-connect-mcp
+
+# Install in development mode
+pip install -e .
+```
+
+### Alternative: Direct Installation from GitHub
+```bash
+# Install directly from GitHub
+pip install git+https://github.com/keides2/coverity-connect-mcp.git
+```
+
+### Future Installation Methods
+
+Once the package is published, these installation methods will be available:
+
+#### PyPI Installation (Coming Soon)
 ```bash
 pip install coverity-connect-mcp
 ```
 
-### Using Docker
+#### Docker Installation (Coming Soon)
 ```bash
-docker pull ${DOCKER_USERNAME}/coverity-connect-mcp:latest
+docker pull keides2/coverity-connect-mcp:latest
 ```
 
-### From Source
+### Development Installation
+
+For development purposes:
+
 ```bash
 git clone https://github.com/keides2/coverity-connect-mcp.git
 cd coverity-connect-mcp
-pip install -e .
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install with development dependencies
+pip install -e ".[dev]"
 ```
 
 ## ⚙️ Configuration
@@ -99,12 +130,16 @@ Add to your `claude_desktop_config.json`:
 ```
 
 ### 3. Docker Configuration
+
+> **Note**: Since the Docker image is not yet published, you can build it locally:
+
 ```yaml
 # docker-compose.yml
 version: '3.8'
 services:
   coverity-mcp:
-    image: keides2/coverity-connect-mcp:latest
+    build: .  # Build from local source
+    # Future: image: keides2/coverity-connect-mcp:latest
     environment:
       - COVAUTHUSER=${COVAUTHUSER}
       - COVAUTHKEY=${COVAUTHKEY}
