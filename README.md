@@ -155,11 +155,13 @@ Show me all CERT-C violations in project "EmbeddedSystem" with impact level "Hig
 
 ## 📚 Documentation
 
-- **[Installation Guide](docs/installation.md)** - Detailed setup instructions
-- **[Configuration Reference](docs/configuration.md)** - Complete configuration options
-- **[Usage Examples](docs/usage.md)** - Real-world usage scenarios
-- **[API Reference](docs/api-reference.md)** - Comprehensive API documentation
-- **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
+- **[Installation Guide](docs/installation.md)** - Detailed setup instructions *(Coming Soon)*
+- **[Configuration Reference](docs/configuration.md)** - Complete configuration options *(Coming Soon)*
+- **[Usage Examples](docs/usage.md)** - Real-world usage scenarios *(Coming Soon)*
+- **[API Reference](docs/api-reference.md)** - Comprehensive API documentation *(Coming Soon)*
+- **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions *(Coming Soon)*
+
+> 📝 **Note**: Detailed documentation is currently being prepared based on real-world usage and community feedback. The main README provides complete setup and usage information to get you started immediately.
 
 ## 🧪 Testing
 
