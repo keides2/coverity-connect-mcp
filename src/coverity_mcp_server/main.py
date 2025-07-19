@@ -40,11 +40,13 @@ from .tools import (
     analyze_snapshot_defects,
     run_coverity_automation,
     parse_coverity_issues,
-    generate_quality_report
+    generate_quality_report,
+    set_config as set_tools_config
 )
 from .resources import (
     get_project_config,
-    list_configured_projects
+    list_configured_projects,
+    set_config as set_resources_config
 )
 from .prompts import (
     coverity_security_analysis,
@@ -61,6 +63,10 @@ def create_server() -> FastMCP:
     
     # Initialize configuration
     config = CoverityConfig()
+    
+    # Set config for submodules
+    set_tools_config(config)
+    set_resources_config(config)
     
     # Initialize MCP server
     mcp = FastMCP(
