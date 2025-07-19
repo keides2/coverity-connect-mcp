@@ -1,0 +1,6 @@
+mcp
+fastmcp
+suds
+pandas
+requests
+pathlib

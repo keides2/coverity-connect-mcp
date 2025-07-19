@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Coverity Connect MCP Server - GitHub Repository Structure</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="coverity-connect-mcp-server---github-repository-structure">Coverity Connect MCP Server - GitHub Repository Structure</h1>
+<h2 id="-推奨ディレクトリ構成">📁 推奨ディレクトリ構成</h2>
+<pre><code>coverity-connect-mcp/
+├── .github/
+│   ├── workflows/
+│   │   ├── test.yml                    # CI/CDテスト
+│   │   ├── publish.yml                 # パッケージ公開
+│   │   └── security.yml                # セキュリティスキャン
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug_report.md
+│   │   ├── feature_request.md
+│   │   └── security_issue.md
+│   └── pull_request_template.md
+├── src/
+│   ├── coverity_mcp_server/
+│   │   ├── __init__.py
+│   │   ├── main.py                     # メインMCPサーバー
+│   │   ├── client.py                   # Coverity Connect クライアント
+│   │   ├── tools.py                    # MCPツール実装
+│   │   ├── resources.py                # MCPリソース実装
+│   │   ├── prompts.py                  # MCPプロンプト実装
+│   │   └── config.py                   # 設定管理
+│   └── tests/
+│       ├── __init__.py
+│       ├── test_client.py
+│       ├── test_tools.py
+│       ├── test_integration.py
+│       └── fixtures/
+│           ├── sample_projects.json
+│           ├── sample_defects.json
+│           └── test_config.yaml
+├── docs/
+│   ├── installation.md
+│   ├── configuration.md
+│   ├── usage.md
+│   ├── api-reference.md
+│   ├── troubleshooting.md
+│   └── examples/
+│       ├── basic-usage.md
+│       ├── ci-cd-integration.md
+│       └── security-analysis.md
+├── examples/
+│   ├── claude_desktop_config.json      # Claude Desktop設定例
+│   ├── docker-compose.yml             # Docker実行例
+│   ├── config_templates/
+│   │   ├── projects.cfg.example
+│   │   └── project_template.cfg
+│   └── scripts/
+│       ├── setup.sh
+│       ├── setup.bat
+│       └── health_check.py
+├── .gitignore
+├── .env.example                        # 環境変数テンプレート
+├── pyproject.toml                      # Python パッケージ設定
+├── requirements.txt                    # 依存関係
+├── requirements-dev.txt                # 開発用依存関係
+├── Dockerfile                          # Docker対応
+├── docker-compose.yml                  # 開発環境
+├── LICENSE                             # ライセンス (MIT推奨)
+├── README.md                           # プロジェクト説明
+├── CHANGELOG.md                        # 変更履歴
+├── CONTRIBUTING.md                     # コントリビューションガイド
+├── SECURITY.md                         # セキュリティポリシー
+└── manifest.json                       # DXT用マニフェスト
+</code></pre>
+<h2 id="️-マーケットプレース公開について">🏷️ マーケットプレース公開について</h2>
+<h3 id="対象マーケットプレース"><strong>対象マーケットプレース</strong></h3>
+<ol>
+<li>
+<p><strong>MCP Server Registry (公式)</strong></p>
+<ul>
+<li>URL: <a href="https://github.com/modelcontextprotocol/servers">https://github.com/modelcontextprotocol/servers</a></li>
+<li>要件: オープンソース、MIT/Apache ライセンス</li>
+<li>公開方法: Pull Request</li>
+</ul>
+</li>
+<li>
+<p><strong>PyPI (Python Package Index)</strong></p>
+<ul>
+<li>パッケージ名: <code>coverity-connect-mcp</code></li>
+<li>インストール: <code>pip install coverity-connect-mcp</code></li>
+</ul>
+</li>
+<li>
+<p><strong>npm (Node.js Package Manager)</strong></p>
+<ul>
+<li>DXTパッケージとして公開</li>
+<li>Claude Desktop Extension Store対応</li>
+</ul>
+</li>
+<li>
+<p><strong>Docker Hub</strong></p>
+<ul>
+<li>コンテナイメージとして配布</li>
+<li>企業環境での利用を想定</li>
+</ul>
+</li>
+</ol>
+<h3 id="公開要件"><strong>公開要件</strong></h3>
+<p>✅ <strong>必須要件</strong></p>
+<ul>
+<li>オープンソースライセンス (MIT/Apache 2.0)</li>
+<li>セキュリティベストプラクティス準拠</li>
+<li>包括的なドキュメント</li>
+<li>テストカバレッジ 80%以上</li>
+<li>CI/CD パイプライン</li>
+</ul>
+<p>✅ <strong>推奨要件</strong></p>
+<ul>
+<li>Docker対応</li>
+<li>複数OS対応 (Windows/macOS/Linux)</li>
+<li>設定例とチュートリアル</li>
+<li>セキュリティ監査対応</li>
+<li>コミュニティサポート</li>
+</ul>
+<h2 id="-ライセンス考慮事項">📋 ライセンス考慮事項</h2>
+<h3 id="推奨-mit-license"><strong>推奨: MIT License</strong></h3>
+<pre><code>MIT License
+
+Copyright (c) 2025 [Your Name]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</code></pre>
+<h3 id="知的財産権への配慮"><strong>知的財産権への配慮</strong></h3>
+<ul>
+<li>Coverity は Synopsys の商標</li>
+<li>Coverity Connect API の利用は適切な認証下で実行</li>
+<li>あなたの独自実装ロジックは保護される</li>
+<li>企業秘密情報は除外</li>
+</ul>
+<h2 id="-公開戦略">🚀 公開戦略</h2>
+<h3 id="フェーズ1-github公開-即座に実行可能"><strong>フェーズ1: GitHub公開 (即座に実行可能)</strong></h3>
+<ol>
+<li>パブリックリポジトリ作成</li>
+<li>基本実装とドキュメント</li>
+<li>CI/CDパイプライン設定</li>
+<li>コミュニティフィードバック収集</li>
+</ol>
+<h3 id="フェーズ2-mcp-registry登録-1-2週間後"><strong>フェーズ2: MCP Registry登録 (1-2週間後)</strong></h3>
+<ol>
+<li>MCP公式レジストリにPR提出</li>
+<li>コードレビュー対応</li>
+<li>セキュリティ監査対応</li>
+<li>公式認定取得</li>
+</ol>
+<h3 id="フェーズ3-パッケージ配布-1ヶ月後"><strong>フェーズ3: パッケージ配布 (1ヶ月後)</strong></h3>
+<ol>
+<li>PyPI パッケージ公開</li>
+<li>Docker Hub イメージ公開</li>
+<li>DXT Extension作成</li>
+<li>企業向けサポート体制</li>
+</ol>
+<h3 id="フェーズ4-エコシステム拡張-3ヶ月後"><strong>フェーズ4: エコシステム拡張 (3ヶ月後)</strong></h3>
+<ol>
+<li>プラグインアーキテクチャ</li>
+<li>サードパーティ統合</li>
+<li>エンタープライズ機能</li>
+<li>商用サポート検討</li>
+</ol>
+<h2 id="-収益化可能性">💰 収益化可能性</h2>
+<h3 id="オープンソース戦略"><strong>オープンソース戦略</strong></h3>
+<ul>
+<li><strong>基本機能</strong>: 完全無料・オープンソース</li>
+<li><strong>プレミアム機能</strong>:
+<ul>
+<li>企業向けサポート</li>
+<li>高度な分析機能</li>
+<li>カスタム統合</li>
+<li>トレーニング・コンサルティング</li>
+</ul>
+</li>
+</ul>
+<h3 id="ビジネスモデル例"><strong>ビジネスモデル例</strong></h3>
+<ol>
+<li><strong>フリーミアム</strong>: 基本無料、高度機能有料</li>
+<li><strong>サポート型</strong>: 実装サポート・保守契約</li>
+<li><strong>SaaS型</strong>: クラウドホスト版提供</li>
+<li><strong>コンサルティング</strong>: Coverity導入支援</li>
+</ol>
+<h2 id="-成功指標">📈 成功指標</h2>
+<h3 id="技術指標"><strong>技術指標</strong></h3>
+<ul>
+<li>GitHub Stars: 100+ (6ヶ月目標)</li>
+<li>PyPI Downloads: 1,000+/月</li>
+<li>Docker Pulls: 500+/月</li>
+<li>Issues Response Time: 48時間以内</li>
+</ul>
+<h3 id="コミュニティ指標"><strong>コミュニティ指標</strong></h3>
+<ul>
+<li>Contributors: 10+</li>
+<li>Forks: 50+</li>
+<li>Community Discussions: アクティブ</li>
+<li>Documentation Quality: 高評価</li>
+</ul>
+<p>この構成により、あなたのCoverity専門知識を活かした価値あるオープンソースプロジェクトとして、広く活用される可能性があります！</p>
+
+            
+            
+        </body>
+        </html>

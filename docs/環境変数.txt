@@ -1,0 +1,17 @@
+# Windowsコマンドプロンプト
+set COVAUTHUSER=shimatani
+set COVAUTHKEY=your_coverity_auth_key
+set COVERITY_HOST=sast.kbit-repo.net
+set COVERITY_PORT=443
+set COVERITY_SSL=True
+set COVERITY_BASE_DIR=C:\cov
+set PYTHONPATH=C:\cov
+
+# 永続化
+setx COVAUTHUSER "shimatani"
+setx COVAUTHKEY
+setx COVERITY_HOST "sast.kbit-repo.net"
+setx COVERITY_PORT "443"
+setx COVERITY_SSL "True"
+setx COVERITY_BASE_DIR "C:\cov"
+setx PYTHONPATH "C:\cov"

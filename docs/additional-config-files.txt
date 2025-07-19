@@ -1,0 +1,397 @@
+# .env.example
+# Coverity Connect Authentication
+COVAUTHUSER=your_coverity_username
+COVAUTHKEY=your_coverity_auth_key
+
+# Coverity Server Configuration
+COVERITY_HOST=sast.kbit-repo.net
+COVERITY_PORT=443
+COVERITY_SSL=True
+
+# Local Configuration
+COVERITY_BASE_DIR=C:\cov
+PYTHONPATH=C:\cov
+
+# Proxy Configuration (if needed)
+HTTP_PROXY=http://bypsproxy.daikin.co.jp:3128/
+HTTPS_PROXY=http://bypsproxy.daikin.co.jp:3128/
+
+# Logging Configuration
+LOG_LEVEL=INFO
+LOG_FORMAT=detailed
+
+# MCP Server Configuration
+MCP_SERVER_PORT=8000
+MCP_SERVER_HOST=localhost
+
+---
+# .gitignore
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Coverity specific
+coverity/
+cov_temp/
+*.log
+*.csv
+*.json
+*.zip
+auth-key/
+snapshots/
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Security
+*.key
+*.pem
+*.p12
+*.pfx
+auth-key.txt
+secrets/
+
+---
+# manifest.json (DXT Package)
+{
+  "name": "coverity-connect-mcp",
+  "version": "1.0.0",
+  "description": "Synopsys Coverity Connect integration for Claude Desktop via Model Context Protocol",
+  "author": "keides2",
+  "license": "MIT",
+  "homepage": "https://github.com/keides2/coverity-connect-mcp",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keides2/coverity-connect-mcp.git"
+  },
+  "keywords": [
+    "coverity",
+    "static-analysis",
+    "security",
+    "mcp",
+    "claude"
+  ],
+  "server": {
+    "command": "coverity-mcp-server",
+    "args": [],
+    "env": {
+      "COVAUTHUSER": {
+        "description": "Coverity Connect username",
+        "required": true,
+        "type": "string"
+      },
+      "COVAUTHKEY": {
+        "description": "Coverity Connect authentication key",
+        "required": true,
+        "type": "string",
+        "sensitive": true
+      },
+      "COVERITY_HOST": {
+        "description": "Coverity Connect server hostname",
+        "required": false,
+        "type": "string",
+        "default": "sast.kbit-repo.net"
+      },
+      "COVERITY_PORT": {
+        "description": "Coverity Connect server port",
+        "required": false,
+        "type": "string",
+        "default": "443"
+      },
+      "COVERITY_SSL": {
+        "description": "Use SSL/TLS connection",
+        "required": false,
+        "type": "boolean",
+        "default": true
+      }
+    }
+  },
+  "mcp": {
+    "capabilities": {
+      "tools": [
+        {
+          "name": "get_coverity_projects",
+          "description": "Retrieve list of accessible Coverity projects"
+        },
+        {
+          "name": "get_project_streams", 
+          "description": "Get streams for a specific project"
+        },
+        {
+          "name": "get_stream_snapshots",
+          "description": "Retrieve snapshot history for a stream"
+        },
+        {
+          "name": "analyze_snapshot_defects",
+          "description": "Perform detailed defect analysis of a snapshot"
+        },
+        {
+          "name": "run_coverity_automation",
+          "description": "Execute automated CI/CD pipeline"
+        },
+        {
+          "name": "parse_coverity_issues",
+          "description": "Parse and filter analysis results"
+        },
+        {
+          "name": "generate_quality_report",
+          "description": "Create executive quality reports"
+        }
+      ],
+      "resources": [
+        {
+          "uri_template": "coverity://config/{project_name}",
+          "description": "Project configuration information"
+        },
+        {
+          "uri_template": "coverity://projects",
+          "description": "List of configured projects"
+        }
+      ],
+      "prompts": [
+        {
+          "name": "coverity_security_analysis",
+          "description": "Template for security vulnerability analysis"
+        },
+        {
+          "name": "coverity_pipeline_setup", 
+          "description": "Template for CI/CD pipeline configuration"
+        }
+      ]
+    }
+  },
+  "installation": {
+    "pip": "coverity-connect-mcp",
+    "docker": "keides2/coverity-connect-mcp:latest"
+  },
+  "support": {
+    "issues": "https://github.com/keides2/coverity-connect-mcp/issues",
+    "discussions": "https://github.com/keides2/coverity-connect-mcp/discussions",
+    "documentation": "https://keides2.github.io/coverity-connect-mcp"
+  }
+}
+
+---
+# requirements.txt
+mcp>=1.0.0
+fastmcp>=0.1.0
+suds-community>=1.1.2
+requests>=2.31.0
+pandas>=1.5.0
+pydantic>=2.0.0
+aiofiles>=23.0.0
+python-dotenv>=1.0.0
+click>=8.0.0
+rich>=13.0.0
+PyYAML>=6.0
+
+---
+# requirements-dev.txt
+# Include production requirements
+-r requirements.txt
+
+# Testing
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.0.0
+pytest-mock>=3.11.0
+
+# Code quality
+black>=23.0.0
+isort>=5.12.0
+flake8>=6.0.0
+mypy>=1.5.0
+bandit>=1.7.0
+safety>=2.3.0
+
+# Pre-commit hooks
+pre-commit>=3.0.0
+
+# Development tools
+tox>=4.0.0
+wheel>=0.40.0
+twine>=4.0.0
+build>=0.10.0
+
+# Documentation
+mkdocs>=1.5.0
+mkdocs-material>=9.0.0
+mkdocstrings[python]>=0.22.0
+
+---
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: check-docstring-first
+
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
+        language_version: python3.11
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        additional_dependencies: [flake8-docstrings]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-requests, types-PyYAML]
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: ["-c", "pyproject.toml"]
+        additional_dependencies: ["bandit[toml]"]
