@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "coverity-connect": {
+      "command": "python",
+      "args": ["-m", "coverity_mcp_server"],
+      "cwd": "C:\\Users\\HP\\Docs\\Security\\coverity-connect-mcp",
+      "env": {
+        "COVERITY_HOST": "your-coverity-server.company.com",
+        "COVERITY_PORT": "8080",
+        "COVERITY_SSL": "True",
+        "COVAUTHUSER": "your_username",
+        "COVAUTHKEY": "your_auth_key",
+        "MCP_DEBUG": "False",
+        "LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}

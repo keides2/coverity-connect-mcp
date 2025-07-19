@@ -1,145 +1,309 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Coverity Connect MCP Server - Main Module
-Enterprise-grade MCP server for Black Duck Coverity Connect static analysis platform
-
-Features:
-- cov_auto: CI/CD pipeline automation
-- cov_snap: Snapshot management and CID detailed analysis
+Coverity Connect MCP Server
+A Model Context Protocol server for interacting with Coverity Connect (Black Duck)
 """
 
 import os
 import sys
-import json
-import csv
-import zipfile
-from datetime import datetime
-from typing import Dict, List, Optional, Any
-import asyncio
-from pathlib import Path
+import logging
+from typing import List, Dict, Any, Optional
+
 import click
-
-# MCP Framework
 from mcp.server.fastmcp import FastMCP
-from mcp import (
-    Context,
-    Tool,
-    Resource,
-    Prompt,
-    TextContent,
-    LoggingLevel,
-)
 
-# Local imports
-from .config import CoverityConfig
-from .tools import (
-    get_coverity_projects,
-    get_project_streams, 
-    get_stream_snapshots,
-    analyze_snapshot_defects,
-    run_coverity_automation,
-    parse_coverity_issues,
-    generate_quality_report,
-    set_config as set_tools_config
-)
-from .resources import (
-    get_project_config,
-    list_configured_projects,
-    set_config as set_resources_config
-)
-from .prompts import (
-    coverity_security_analysis,
-    coverity_pipeline_setup
-)
+from .coverity_client import CoverityClient
 
-# Global MCP server instance
-mcp = None
-config = None
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
-def create_server() -> FastMCP:
-    """Create and configure the MCP server instance"""
-    global mcp, config
+# Global client instance
+coverity_client: Optional[CoverityClient] = None
+
+def initialize_client() -> CoverityClient:
+    """Initialize Coverity client with environment variables"""
+    global coverity_client
     
-    # Initialize configuration
-    config = CoverityConfig()
+    if coverity_client is not None:
+        return coverity_client
     
-    # Set config for submodules
-    set_tools_config(config)
-    set_resources_config(config)
+    # Get configuration from environment variables
+    host = os.getenv('COVERITY_HOST')
+    port = int(os.getenv('COVERITY_PORT', '8080'))
+    use_ssl = os.getenv('COVERITY_SSL', 'True').lower() == 'true'
+    username = os.getenv('COVAUTHUSER')
+    password = os.getenv('COVAUTHKEY')
     
-    # Initialize MCP server
-    mcp = FastMCP(
-        name="Coverity Connect Server",
-        dependencies=["requests", "suds", "pandas"]
+    if not host or not username or not password:
+        raise ValueError("Missing required environment variables: COVERITY_HOST, COVAUTHUSER, COVAUTHKEY")
+    
+    coverity_client = CoverityClient(
+        host=host,
+        port=port,
+        use_ssl=use_ssl,
+        username=username,
+        password=password
     )
     
+    logger.info(f"Initialized Coverity client for {host}:{port}")
+    return coverity_client
+
+def create_server() -> FastMCP:
+    """Create and configure the MCP server"""
+    # Initialize the server
+    mcp = FastMCP("Coverity Connect MCP Server")
+    
+    # Initialize Coverity client
+    try:
+        initialize_client()
+        logger.info("Coverity client initialized successfully")
+    except Exception as e:
+        logger.error(f"Failed to initialize Coverity client: {e}")
+        raise
+    
+    # Register resources using decorators
+    @mcp.resource("coverity://projects/{project_id}/config")
+    async def get_project_config(project_id: str) -> str:
+        """Get project configuration"""
+        try:
+            client = initialize_client()
+            project = await client.get_project(project_id)
+            if not project:
+                return f"Project {project_id} not found"
+            
+            config_info = {
+                "project_id": project.get('projectKey'),
+                "project_name": project.get('projectName'),
+                "description": project.get('description', 'No description'),
+                "created_date": project.get('createdDate'),
+                "last_modified": project.get('lastModified'),
+                "streams": project.get('streams', [])
+            }
+            
+            return f"Project Configuration:\n{config_info}"
+            
+        except Exception as e:
+            logger.error(f"Error getting project config: {e}")
+            return f"Error: {str(e)}"
+    
+    @mcp.resource("coverity://streams/{stream_id}/defects")
+    async def get_stream_defects(stream_id: str) -> str:
+        """Get defects for a stream"""
+        try:
+            client = initialize_client()
+            defects = await client.get_defects(stream_id=stream_id)
+            
+            if not defects:
+                return f"No defects found for stream {stream_id}"
+            
+            defect_summary = []
+            for defect in defects[:10]:  # Limit to first 10 for readability
+                defect_summary.append({
+                    "cid": defect.get('cid'),
+                    "checker": defect.get('checkerName'),
+                    "type": defect.get('displayType'),
+                    "severity": defect.get('displayImpact'),
+                    "status": defect.get('displayStatus'),
+                    "file": defect.get('displayFile'),
+                    "function": defect.get('displayFunction')
+                })
+            
+            return f"Stream {stream_id} Defects (showing first 10):\n{defect_summary}"
+            
+        except Exception as e:
+            logger.error(f"Error getting stream defects: {e}")
+            return f"Error: {str(e)}"
+    
     # Register tools
-    mcp.add_tool(get_coverity_projects)
-    mcp.add_tool(get_project_streams)
-    mcp.add_tool(get_stream_snapshots)
-    mcp.add_tool(analyze_snapshot_defects)
-    mcp.add_tool(run_coverity_automation)
-    mcp.add_tool(parse_coverity_issues)
-    mcp.add_tool(generate_quality_report)
+    @mcp.tool()
+    async def search_defects(
+        query: str = "",
+        stream_id: str = "",
+        checker: str = "",
+        severity: str = "",
+        status: str = "",
+        limit: int = 50
+    ) -> List[Dict[str, Any]]:
+        """
+        Search for defects in Coverity Connect
+        
+        Args:
+            query: General search query
+            stream_id: Filter by stream ID
+            checker: Filter by checker name
+            severity: Filter by severity (High, Medium, Low)
+            status: Filter by status (New, Triaged, Fixed, etc.)
+            limit: Maximum number of results to return
+        """
+        try:
+            client = initialize_client()
+            
+            # Build filter parameters
+            filters = {}
+            if stream_id:
+                filters['streamId'] = stream_id
+            if checker:
+                filters['checker'] = checker
+            if severity:
+                filters['severity'] = severity
+            if status:
+                filters['status'] = status
+            
+            defects = await client.get_defects(
+                query=query,
+                filters=filters,
+                limit=limit
+            )
+            
+            return defects if defects else []
+            
+        except Exception as e:
+            logger.error(f"Error searching defects: {e}")
+            return [{"error": str(e)}]
     
-    # Register resources
-    mcp.add_resource(get_project_config)
-    mcp.add_resource(list_configured_projects)
+    @mcp.tool()
+    async def get_defect_details(cid: str) -> Dict[str, Any]:
+        """
+        Get detailed information about a specific defect
+        
+        Args:
+            cid: Coverity Issue Identifier
+        """
+        try:
+            client = initialize_client()
+            defect = await client.get_defect_details(cid)
+            
+            if not defect:
+                return {"error": f"Defect {cid} not found"}
+            
+            return defect
+            
+        except Exception as e:
+            logger.error(f"Error getting defect details: {e}")
+            return {"error": str(e)}
     
-    # Register prompts
-    mcp.add_prompt(coverity_security_analysis)
-    mcp.add_prompt(coverity_pipeline_setup)
+    @mcp.tool()
+    async def list_projects() -> List[Dict[str, Any]]:
+        """List all projects in Coverity Connect"""
+        try:
+            client = initialize_client()
+            projects = await client.get_projects()
+            
+            return projects if projects else []
+            
+        except Exception as e:
+            logger.error(f"Error listing projects: {e}")
+            return [{"error": str(e)}]
+    
+    @mcp.tool()
+    async def list_streams(project_id: str = "") -> List[Dict[str, Any]]:
+        """
+        List streams, optionally filtered by project
+        
+        Args:
+            project_id: Optional project ID to filter streams
+        """
+        try:
+            client = initialize_client()
+            streams = await client.get_streams(project_id=project_id)
+            
+            return streams if streams else []
+            
+        except Exception as e:
+            logger.error(f"Error listing streams: {e}")
+            return [{"error": str(e)}]
+    
+    @mcp.tool()
+    async def get_project_summary(project_id: str) -> Dict[str, Any]:
+        """
+        Get summary information for a project including defect counts
+        
+        Args:
+            project_id: Project identifier
+        """
+        try:
+            client = initialize_client()
+            
+            # Get project details
+            project = await client.get_project(project_id)
+            if not project:
+                return {"error": f"Project {project_id} not found"}
+            
+            # Get streams for this project
+            streams = await client.get_streams(project_id=project_id)
+            
+            # Get defect summary for each stream
+            stream_summaries = []
+            for stream in streams or []:
+                stream_id = stream.get('name', '')
+                defects = await client.get_defects(stream_id=stream_id, limit=1000)
+                
+                # Count defects by severity
+                severity_counts = {'High': 0, 'Medium': 0, 'Low': 0}
+                status_counts = {}
+                
+                for defect in defects or []:
+                    severity = defect.get('displayImpact', 'Unknown')
+                    status = defect.get('displayStatus', 'Unknown')
+                    
+                    if severity in severity_counts:
+                        severity_counts[severity] += 1
+                    
+                    status_counts[status] = status_counts.get(status, 0) + 1
+                
+                stream_summaries.append({
+                    'stream_name': stream_id,
+                    'total_defects': len(defects or []),
+                    'severity_breakdown': severity_counts,
+                    'status_breakdown': status_counts
+                })
+            
+            return {
+                'project': project,
+                'streams': stream_summaries,
+                'total_streams': len(streams or [])
+            }
+            
+        except Exception as e:
+            logger.error(f"Error getting project summary: {e}")
+            return {"error": str(e)}
     
     return mcp
 
 def run_server():
     """Run the MCP server"""
-    global mcp, config
-    
-    if mcp is None:
-        mcp = create_server()
-    
-    # Environment variables check
-    required_vars = ["COVAUTHUSER", "COVAUTHKEY"]
-    missing_vars = [var for var in required_vars if not os.getenv(var)]
-    
-    if missing_vars:
-        print(f"Warning: Missing environment variables: {missing_vars}")
-        print("Some functionality may be limited.")
-    
-    # Check for covautolib availability
     try:
-        from covautolib import covautolib_2, covautolib_3
-        print("Info: covautolib available - full functionality enabled")
-    except ImportError:
-        print("Warning: covautolib not available. Running in limited mode.")
-    
-    # Start MCP server
-    print(f"Starting Coverity Connect MCP Server...")
-    print(f"Server: {config.host}:{config.port}")
-    print(f"User: {config.username}")
-    mcp.run()
+        mcp = create_server()
+        mcp.run()
+    except Exception as e:
+        logger.error(f"Failed to start server: {e}")
+        sys.exit(1)
 
 @click.command()
-@click.option('--host', default=None, help='Coverity Connect server host')
-@click.option('--port', default=None, help='Coverity Connect server port')
-@click.option('--user', default=None, help='Coverity Connect username')
-@click.option('--debug', is_flag=True, help='Enable debug mode')
-def cli(host, port, user, debug):
-    """Coverity Connect MCP Server CLI"""
+@click.option('--host', default='localhost', help='Coverity Connect host')
+@click.option('--port', default=8080, help='Coverity Connect port')
+@click.option('--ssl/--no-ssl', default=True, help='Use SSL connection')
+@click.option('--username', help='Coverity username (or set COVAUTHUSER env var)')
+@click.option('--password', help='Coverity password (or set COVAUTHKEY env var)')
+def cli(host, port, ssl, username, password):
+    """Start the Coverity Connect MCP Server"""
     
-    # Override config with CLI options
+    # Set environment variables if provided via CLI
     if host:
         os.environ['COVERITY_HOST'] = host
     if port:
         os.environ['COVERITY_PORT'] = str(port)
-    if user:
-        os.environ['COVAUTHUSER'] = user
-    if debug:
-        os.environ['LOG_LEVEL'] = 'DEBUG'
+    if ssl is not None:
+        os.environ['COVERITY_SSL'] = str(ssl)
+    if username:
+        os.environ['COVAUTHUSER'] = username
+    if password:
+        os.environ['COVAUTHKEY'] = password
     
-    # Run the server
     run_server()
 
 if __name__ == "__main__":

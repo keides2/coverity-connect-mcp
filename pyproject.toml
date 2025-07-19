@@ -7,10 +7,10 @@ name = "coverity-connect-mcp"
 version = "1.0.0"
 description = "Model Context Protocol server for Black Duck Coverity Connect static analysis platform"
 authors = [
-    {name = "${PACKAGE_AUTHOR:-Your Name}", email = "${PACKAGE_AUTHOR_EMAIL:-your.email@example.com}"}
+    {name = "Coverity MCP Contributors", email = "noreply@github.com"}
 ]
 maintainers = [
-    {name = "${PACKAGE_AUTHOR:-Your Name}", email = "${PACKAGE_AUTHOR_EMAIL:-your.email@example.com}"}
+    {name = "Coverity MCP Contributors", email = "noreply@github.com"}
 ]
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -81,12 +81,12 @@ docker = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/${GITHUB_USERNAME:-your-username}/coverity-connect-mcp"
-Documentation = "https://${GITHUB_USERNAME:-your-username}.github.io/coverity-connect-mcp"
-Repository = "https://github.com/${GITHUB_USERNAME:-your-username}/coverity-connect-mcp.git"
-Issues = "https://github.com/${GITHUB_USERNAME:-your-username}/coverity-connect-mcp/issues"
-Changelog = "https://github.com/${GITHUB_USERNAME:-your-username}/coverity-connect-mcp/blob/main/CHANGELOG.md"
-Discussions = "https://github.com/${GITHUB_USERNAME:-your-username}/coverity-connect-mcp/discussions"
+Homepage = "https://github.com/keides2/coverity-connect-mcp"
+Documentation = "https://keides2.github.io/coverity-connect-mcp"
+Repository = "https://github.com/keides2/coverity-connect-mcp.git"
+Issues = "https://github.com/keides2/coverity-connect-mcp/issues"
+Changelog = "https://github.com/keides2/coverity-connect-mcp/blob/main/CHANGELOG.md"
+Discussions = "https://github.com/keides2/coverity-connect-mcp/discussions"
 
 [project.scripts]
 coverity-mcp = "coverity_mcp_server.main:cli"
