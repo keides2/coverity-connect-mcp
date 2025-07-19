@@ -155,13 +155,21 @@ Show me all CERT-C violations in project "EmbeddedSystem" with impact level "Hig
 
 ## 📚 Documentation
 
-- **[Installation Guide](docs/installation.md)** - Detailed setup instructions *(Coming Soon)*
-- **[Configuration Reference](docs/configuration.md)** - Complete configuration options *(Coming Soon)*
-- **[Usage Examples](docs/usage.md)** - Real-world usage scenarios *(Coming Soon)*
-- **[API Reference](docs/api-reference.md)** - Comprehensive API documentation *(Coming Soon)*
-- **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions *(Coming Soon)*
+### English
+- **[Installation Guide](docs/installation.md)** - Detailed setup instructions for all platforms
+- **[Configuration Reference](docs/configuration.md)** - Complete configuration options and security settings
+- **[API Reference](docs/api.md)** - Comprehensive API documentation with examples
+- **[Setup Guide](SETUP_GUIDE.md)** - Complete development to production setup
+- **[Usage Examples](examples/)** - Environment-specific configurations and examples
 
-> 📝 **Note**: Detailed documentation is currently being prepared based on real-world usage and community feedback. The main README provides complete setup and usage information to get you started immediately.
+### 日本語 (Japanese)
+- **[インストールガイド](docs/ja/installation.md)** - 詳細なセットアップ手順（全プラットフォーム対応）
+- **[設定リファレンス](docs/ja/configuration.md)** - 完全な設定オプションとセキュリティ設定
+- **[API リファレンス](docs/ja/api.md)** - 包括的なAPI仕様書と使用例
+- **[セットアップガイド](SETUP_GUIDE.md)** - 開発から本番環境までの完全セットアップ
+- **[使用例](examples/)** - 環境別設定とサンプル
+
+> 🌐 **多言語サポート**: 英語と日本語の完全ドキュメントを提供しています。すべてのガイドにはステップバイステップの手順、トラブルシューティングのヒント、実用的な例が含まれています。
 
 ## 🧪 Testing
 
