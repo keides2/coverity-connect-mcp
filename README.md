@@ -1,6 +1,6 @@
 # Coverity Connect MCP Server
 
-![Coverity Connect MCP Server](top.png)
+<img src="top.png" alt="Coverity Connect MCP Server" width="700">
 
 [![PyPI version](https://badge.fury.io/py/coverity-connect-mcp.svg)](https://badge.fury.io/py/coverity-connect-mcp)
 [![Python Support](https://img.shields.io/pypi/pyversions/coverity-connect-mcp.svg)](https://pypi.org/project/coverity-connect-mcp/)
