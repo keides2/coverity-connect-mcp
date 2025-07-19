@@ -1,5 +1,7 @@
 # Coverity Connect MCP Server
 
+![Coverity Connect MCP Server](top.png)
+
 [![PyPI version](https://badge.fury.io/py/coverity-connect-mcp.svg)](https://badge.fury.io/py/coverity-connect-mcp)
 [![Python Support](https://img.shields.io/pypi/pyversions/coverity-connect-mcp.svg)](https://pypi.org/project/coverity-connect-mcp/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -155,10 +157,10 @@ services:
 
 ## 📚 ドキュメント
 
-- **[インストールガイド](docs/installation.md)** - 詳細なセットアップ手順 *(作成中)*
-- **[設定リファレンス](docs/configuration.md)** - 完全な設定オプション *(作成中)*
+- **[インストールガイド](docs/ja/installation.md)** - 詳細なセットアップ手順
+- **[設定リファレンス](docs/ja/configuration.md)** - 完全な設定オプション
+- **[APIリファレンス](docs/ja/api.md)** - 包括的なAPIドキュメント
 - **[使用例](docs/usage.md)** - 実際の使用シナリオ *(作成中)*
-- **[APIリファレンス](docs/api-reference.md)** - 包括的なAPIドキュメント *(作成中)*
 - **[トラブルシューティング](docs/troubleshooting.md)** - よくある問題と解決方法 *(作成中)*
 
 > 📝 **注意**: 詳細なドキュメントは、実際の使用例とコミュニティフィードバックを基に作成中です。メインREADMEには、すぐに始めるための完全なセットアップと使用情報が提供されています。
