@@ -3,8 +3,10 @@
 [![PyPI version](https://badge.fury.io/py/coverity-connect-mcp.svg)](https://badge.fury.io/py/coverity-connect-mcp)
 [![Python Support](https://img.shields.io/pypi/pyversions/coverity-connect-mcp.svg)](https://pypi.org/project/coverity-connect-mcp/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://github.com/${GITHUB_USERNAME}/coverity-connect-mcp/workflows/Tests/badge.svg)](https://github.com/${GITHUB_USERNAME}/coverity-connect-mcp/actions)
-[![Coverage](https://codecov.io/gh/${GITHUB_USERNAME}/coverity-connect-mcp/branch/main/graph/badge.svg)](https://codecov.io/gh/${GITHUB_USERNAME}/coverity-connect-mcp)
+[![Tests](https://github.com/keides2/coverity-connect-mcp/workflows/Tests/badge.svg)](https://github.com/keides2/coverity-connect-mcp/actions)
+[![Coverage](https://codecov.io/gh/keides2/coverity-connect-mcp/branch/main/graph/badge.svg)](https://codecov.io/gh/keides2/coverity-connect-mcp)
+
+**English** | [日本語](README_ja.md)
 
 A **Model Context Protocol (MCP) server** that provides seamless integration between AI assistants (like Claude Desktop) and **Black Duck Coverity Connect** static analysis platform.
 
@@ -46,7 +48,7 @@ docker pull ${DOCKER_USERNAME}/coverity-connect-mcp:latest
 
 ### From Source
 ```bash
-git clone https://github.com/${GITHUB_USERNAME}/coverity-connect-mcp.git
+git clone https://github.com/keides2/coverity-connect-mcp.git
 cd coverity-connect-mcp
 pip install -e .
 ```
@@ -100,7 +102,7 @@ Add to your `claude_desktop_config.json`:
 version: '3.8'
 services:
   coverity-mcp:
-    image: ${DOCKER_USERNAME}/coverity-connect-mcp:latest
+    image: keides2/coverity-connect-mcp:latest
     environment:
       - COVAUTHUSER=${COVAUTHUSER}
       - COVAUTHKEY=${COVAUTHKEY}
@@ -181,7 +183,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ### Development Setup
 ```bash
-git clone https://github.com/${GITHUB_USERNAME}/coverity-connect-mcp.git
+git clone https://github.com/keides2/coverity-connect-mcp.git
 cd coverity-connect-mcp
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -208,8 +210,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **GitHub Issues**: [Report bugs or request features](https://github.com/${GITHUB_USERNAME}/coverity-connect-mcp/issues)
-- **Discussions**: [Community support and questions](https://github.com/${GITHUB_USERNAME}/coverity-connect-mcp/discussions)
+- **GitHub Issues**: [Report bugs or request features](https://github.com/keides2/coverity-connect-mcp/issues)
+- **Discussions**: [Community support and questions](https://github.com/keides2/coverity-connect-mcp/discussions)
 - **Security Issues**: Please see our [Security Policy](SECURITY.md)
 
 ## 🗺️ Roadmap
