@@ -22,6 +22,7 @@ keywords = [
     "model-context-protocol",
     "security",
     "code-quality",
+    "user-management",
     "synopsys",
     "claude",
     "ai-assistant"
@@ -47,6 +48,7 @@ requires-python = ">=3.8"
 dependencies = [
     "mcp>=1.0.0",
     "fastmcp>=0.1.0",
+    "aiohttp>=3.8.0",
     "suds-community>=1.1.2",
     "requests>=2.31.0",
     "pandas>=1.5.0",

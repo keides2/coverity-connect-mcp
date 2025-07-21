@@ -9,10 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial MCP server implementation for Black Duck Coverity Connect
-- Comprehensive SOAP API integration
+- Comprehensive REST API integration with 8 MCP tools
 - Project and stream management tools
-- Snapshot analysis capabilities
-- Security vulnerability analysis
+- Advanced defect search and analysis capabilities 
+- ✨ **User Management Features**: Complete user administration system
+  - `list_users`: List all users with filtering options
+  - `get_user_details`: Get detailed user information
+  - `get_user_roles`: Get user role and permission information with Japanese descriptions
+- Security vulnerability analysis tools
 - Quality reporting features
 - Docker containerization support
 - GitHub Actions CI/CD pipeline
@@ -47,16 +51,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical Details
 - Python 3.8+ support
 - FastMCP framework integration
-- SUDS SOAP client for Coverity API
-- Async/await pattern throughout
+- aiohttp async HTTP client for REST API communication
 - Type hints and mypy compatibility
 - Black code formatting
 - pytest test framework
 - GitHub Actions automation
 
+### MCP Tools Implemented
+- `search_defects`: Advanced defect search with filtering
+- `get_defect_details`: Detailed defect information retrieval
+- `list_projects`: Project inventory management
+- `list_streams`: Stream management by project
+- `get_project_summary`: Comprehensive project analysis
+- `list_users`: User inventory and management ✨
+- `get_user_details`: Individual user profile access ✨
+- `get_user_roles`: Role-based access control analysis ✨
+
 ### Dependencies
 - mcp>=1.0.0
 - fastmcp>=0.1.0
+- aiohttp>=3.8.0
 - suds-community>=1.1.2
 - requests>=2.31.0
 - pandas>=1.5.0

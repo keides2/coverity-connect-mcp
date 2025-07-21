@@ -18,16 +18,17 @@ Transform your Coverity workflow with natural language commands and automated an
 
 ### 🔍 **Comprehensive Coverity Integration**
 - **Project Management**: List and explore Coverity projects and streams
-- **Snapshot Analysis**: Detailed defect analysis with automated reporting
+- **Defect Analysis**: Advanced defect search with intelligent filtering and detailed analysis
+- **User Management**: Complete user administration, role management, and access control
 - **Security Focus**: Specialized security vulnerability detection and analysis
 - **CI/CD Automation**: Automated pipeline integration for continuous quality monitoring
 - **Quality Reports**: Executive-level quality dashboards and trend analysis
 
 ### 🤖 **AI-Powered Analysis**
-- **Natural Language Queries**: "Show me critical security issues in project X"
-- **Intelligent Filtering**: Automatic prioritization of high-impact defects
-- **Contextual Recommendations**: AI-driven remediation suggestions
-- **Trend Analysis**: Historical data analysis and quality metrics
+- **Natural Language Queries**: "Show me critical security issues in project X" or "List users with administrator privileges"
+- **Intelligent Filtering**: Automatic prioritization of high-impact defects and user access management
+- **Contextual Recommendations**: AI-driven remediation suggestions and security audit insights
+- **Trend Analysis**: Historical data analysis, quality metrics, and user activity patterns
 
 ### 🛠️ **Enterprise Ready**
 - **SOAP API Integration**: Full Coverity Connect Web Services support
@@ -178,17 +179,28 @@ Run automated Coverity analysis for group "web-team", project "frontend", branch
 Show me all CERT-C violations in project "EmbeddedSystem" with impact level "High" and provide code examples for fixes
 ```
 
+### User Management & Security Audit
+```
+List all users with administrator privileges and show their last login times
+```
+
+### Role-Based Access Control
+```
+Show me the permissions and role assignments for user "developer1" and identify any security concerns
+```
+
 ## 🛠️ Available Tools
 
 | Tool | Description | Example Usage |
 |------|-------------|---------------|
-| `get_coverity_projects` | List all accessible Coverity projects | Project inventory and access verification |
-| `get_project_streams` | Get streams for a specific project | Stream-based analysis planning |
-| `get_stream_snapshots` | Retrieve snapshot history for a stream | Historical analysis and trend tracking |
-| `analyze_snapshot_defects` | Detailed defect analysis of a snapshot | In-depth security and quality analysis |
-| `run_coverity_automation` | Execute automated CI/CD pipeline | Continuous integration workflows |
-| `parse_coverity_issues` | Parse and filter analysis results | Custom reporting and data extraction |
-| `generate_quality_report` | Create executive quality reports | Management reporting and KPIs |
+| `search_defects` | Advanced defect search with filtering | Find high-severity security vulnerabilities |
+| `get_defect_details` | Get detailed information about a specific defect | Analyze defect events and remediation steps |
+| `list_projects` | List all accessible Coverity projects | Project inventory and access verification |
+| `list_streams` | Get streams for a specific project | Stream-based analysis planning |
+| `get_project_summary` | Get comprehensive project analysis | Executive project health reports |
+| `list_users` | 🆕 List all users in Coverity Connect | User inventory and access management |
+| `get_user_details` | 🆕 Get detailed information about a user | User profile and account status verification |
+| `get_user_roles` | 🆕 Get user role and permission information | Security audit and access control review |
 
 ## 📚 Documentation
 
@@ -263,10 +275,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🗺️ Roadmap
 
-- [ ] **v1.1**: Advanced filtering and custom views
-- [ ] **v1.2**: Multi-tenant support and user management
-- [ ] **v1.3**: REST API alongside SOAP support
-- [ ] **v1.4**: Machine learning-powered defect prioritization
+- [x] **v1.0**: Complete MCP implementation with user management ✨
+- [ ] **v1.1**: Advanced filtering, custom views, and analytics dashboards
+- [ ] **v1.2**: Multi-tenant support and enhanced user administration
+- [ ] **v1.3**: GraphQL API and real-time notifications
+- [ ] **v1.4**: Machine learning-powered defect prioritization and risk assessment
 - [ ] **v2.0**: Plugin architecture and third-party integrations
 
 ---
