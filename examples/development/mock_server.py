@@ -54,6 +54,125 @@ DUMMY_SNAPSHOTS = [
     {"id": "12347", "dateCreated": "2024-07-13T11:20:00Z", "user": "developer2"}
 ]
 
+# ダミーユーザーデータ
+DUMMY_USERS = [
+    {
+        "name": "admin",
+        "email": "admin@company.com",
+        "familyName": "Administrator", 
+        "givenName": "System",
+        "disabled": False,
+        "locked": False,
+        "superUser": True,
+        "groupNames": ["Administrators", "Users"],
+        "roleAssignments": [
+            {
+                "roleName": "administrator",
+                "scope": "global",
+                "username": "admin",
+                "roleAssignmentType": "user"
+            }
+        ],
+        "lastLogin": "2024-07-21T10:00:00Z",
+        "dateCreated": "2024-01-01T00:00:00Z",
+        "dateModified": "2024-07-21T10:00:00Z",
+        "local": True,
+        "locale": "ja_JP"
+    },
+    {
+        "name": "developer1",
+        "email": "dev1@company.com",
+        "familyName": "開発",
+        "givenName": "太郎",
+        "disabled": False,
+        "locked": False,
+        "superUser": False,
+        "groupNames": ["Users"],
+        "roleAssignments": [
+            {
+                "roleName": "developer",
+                "scope": "global", 
+                "username": "developer1",
+                "roleAssignmentType": "user"
+            }
+        ],
+        "lastLogin": "2024-07-20T15:30:00Z",
+        "dateCreated": "2024-02-01T00:00:00Z",
+        "dateModified": "2024-07-20T15:30:00Z",
+        "local": True,
+        "locale": "ja_JP"
+    },
+    {
+        "name": "projectowner1",
+        "email": "owner1@company.com",
+        "familyName": "プロジェクト",
+        "givenName": "花子",
+        "disabled": False,
+        "locked": False,
+        "superUser": False,
+        "groupNames": ["Users"],
+        "roleAssignments": [
+            {
+                "roleName": "projectOwner",
+                "scope": "project",
+                "username": "projectowner1",
+                "roleAssignmentType": "user"
+            }
+        ],
+        "lastLogin": "2024-07-19T09:15:00Z",
+        "dateCreated": "2024-03-01T00:00:00Z",
+        "dateModified": "2024-07-19T09:15:00Z",
+        "local": True,
+        "locale": "ja_JP"
+    },
+    {
+        "name": "analyst1",
+        "email": "analyst1@company.com",
+        "familyName": "分析",
+        "givenName": "次郎",
+        "disabled": False,
+        "locked": False,
+        "superUser": False,
+        "groupNames": ["Users"],
+        "roleAssignments": [
+            {
+                "roleName": "analyst",
+                "scope": "global",
+                "username": "analyst1",
+                "roleAssignmentType": "user"
+            }
+        ],
+        "lastLogin": "2024-07-18T13:45:00Z",
+        "dateCreated": "2024-04-01T00:00:00Z",
+        "dateModified": "2024-07-18T13:45:00Z",
+        "local": True,
+        "locale": "en_US"
+    },
+    {
+        "name": "disabled_user",
+        "email": "disabled@company.com",
+        "familyName": "無効",
+        "givenName": "ユーザー",
+        "disabled": True,
+        "locked": False,
+        "superUser": False,
+        "groupNames": ["Users"],
+        "roleAssignments": [
+            {
+                "roleName": "viewer",
+                "scope": "global",
+                "username": "disabled_user",
+                "roleAssignmentType": "user"
+            }
+        ],
+        "lastLogin": "2024-05-01T10:00:00Z",
+        "dateCreated": "2024-05-01T00:00:00Z",
+        "dateModified": "2024-06-01T00:00:00Z",
+        "local": True,
+        "locale": "ja_JP"
+    }
+]
+
 def create_soap_response(content):
     """SOAP レスポンス形式を作成"""
     return f"""<?xml version="1.0" encoding="UTF-8"?>
@@ -306,6 +425,157 @@ COVAUTHKEY=dummy_key
     <p><strong>このサーバーはCoverity Connect MCP Serverのテスト用です。</strong></p>
     """
 
+# ==================== ユーザー管理 REST API エンドポイント ====================
+
+@app.route('/api/v2/users', methods=['GET'])
+def get_users():
+    """ユーザー一覧取得 API"""
+    try:
+        # パラメータ取得
+        disabled = request.args.get('disabled', 'false').lower() == 'true'
+        include_details = request.args.get('includeDetails', 'true').lower() == 'true'
+        locked = request.args.get('locked', 'false').lower() == 'true'
+        row_count = int(request.args.get('rowCount', '200'))
+        offset = int(request.args.get('offset', '0'))
+        sort_column = request.args.get('sortColumn', 'name')
+        sort_order = request.args.get('sortOrder', 'asc')
+        
+        # フィルタリング
+        filtered_users = []
+        for user in DUMMY_USERS:
+            # disabled フィルタ
+            if not disabled and user.get('disabled', False):
+                continue
+            # locked フィルタ  
+            if not locked and user.get('locked', False):
+                continue
+            
+            filtered_users.append(user)
+        
+        # ソート
+        reverse_sort = sort_order.lower() == 'desc'
+        if sort_column == 'name':
+            filtered_users.sort(key=lambda x: x.get('name', ''), reverse=reverse_sort)
+        elif sort_column == 'email':
+            filtered_users.sort(key=lambda x: x.get('email', ''), reverse=reverse_sort)
+        elif sort_column == 'dateCreated':
+            filtered_users.sort(key=lambda x: x.get('dateCreated', ''), reverse=reverse_sort)
+        
+        # ページング
+        total_count = len(filtered_users)
+        start_idx = offset
+        end_idx = min(offset + row_count, total_count)
+        paged_users = filtered_users[start_idx:end_idx]
+        
+        response_data = {
+            "users": paged_users,
+            "totalCount": total_count,
+            "offset": offset,
+            "rowCount": len(paged_users)
+        }
+        
+        return Response(
+            json.dumps(response_data, indent=2, ensure_ascii=False),
+            mimetype='application/json'
+        )
+        
+    except Exception as e:
+        error_response = {
+            "error": f"ユーザー一覧取得エラー: {str(e)}",
+            "httpStatusCode": 500
+        }
+        return Response(
+            json.dumps(error_response, ensure_ascii=False),
+            mimetype='application/json',
+            status=500
+        )
+
+@app.route('/api/v2/users/<username>', methods=['GET'])
+def get_user_details(username):
+    """特定ユーザー詳細取得 API"""
+    try:
+        # ユーザー検索
+        found_user = None
+        for user in DUMMY_USERS:
+            if user.get('name') == username:
+                found_user = user
+                break
+        
+        if not found_user:
+            error_response = {
+                "statusMessage": "見つかりません",
+                "httpStatusCode": 404,
+                "detailMessage": f"{username} に一致するユーザーが見つかりません。"
+            }
+            return Response(
+                json.dumps(error_response, ensure_ascii=False),
+                mimetype='application/json',
+                status=404
+            )
+        
+        response_data = {
+            "users": [found_user]
+        }
+        
+        return Response(
+            json.dumps(response_data, indent=2, ensure_ascii=False),
+            mimetype='application/json'
+        )
+        
+    except Exception as e:
+        error_response = {
+            "error": f"ユーザー詳細取得エラー: {str(e)}",
+            "httpStatusCode": 500
+        }
+        return Response(
+            json.dumps(error_response, ensure_ascii=False),
+            mimetype='application/json',
+            status=500
+        )
+
+@app.route('/api/v2/users/summary', methods=['GET'])
+def get_users_summary():
+    """ユーザーサマリー情報取得 API"""
+    try:
+        total_users = len(DUMMY_USERS)
+        active_users = len([u for u in DUMMY_USERS if not u.get('disabled', False)])
+        disabled_users = total_users - active_users
+        admin_users = len([u for u in DUMMY_USERS if u.get('superUser', False)])
+        
+        # ロール別集計
+        role_counts = {}
+        for user in DUMMY_USERS:
+            for role_assignment in user.get('roleAssignments', []):
+                role_name = role_assignment.get('roleName', 'unknown')
+                role_counts[role_name] = role_counts.get(role_name, 0) + 1
+        
+        response_data = {
+            "summary": {
+                "totalUsers": total_users,
+                "activeUsers": active_users,
+                "disabledUsers": disabled_users,
+                "adminUsers": admin_users,
+                "roleDistribution": role_counts
+            },
+            "lastUpdated": "2024-07-21T10:00:00Z"
+        }
+        
+        return Response(
+            json.dumps(response_data, indent=2, ensure_ascii=False),
+            mimetype='application/json'
+        )
+        
+    except Exception as e:
+        error_response = {
+            "error": f"ユーザーサマリー取得エラー: {str(e)}",
+            "httpStatusCode": 500
+        }
+        return Response(
+            json.dumps(error_response, ensure_ascii=False),
+            mimetype='application/json',
+            status=500
+        )
+
 if __name__ == '__main__':
     print("🎭 Starting Dummy Coverity Connect Server...")
     print("📍 Server will be available at: http://localhost:5000")
@@ -316,6 +586,18 @@ if __name__ == '__main__':
     print("   COVAUTHUSER=dummy_user")
     print("   COVAUTHKEY=dummy_key")
     print("")
-    print("🚀 Starting Flask server...")
+    print("� Available test users:")
+    print("   - admin (administrator)")
+    print("   - developer1 (developer)")
+    print("   - projectowner1 (project owner)")
+    print("   - analyst1 (analyst)")
+    print("   - disabled_user (disabled)")
+    print("")
+    print("🔗 User API endpoints:")
+    print("   GET /api/v2/users - List all users")
+    print("   GET /api/v2/users/{username} - Get user details")
+    print("   GET /api/v2/users/summary - Get user summary")
+    print("")
+    print("�🚀 Starting Flask server...")
     
     app.run(host='0.0.0.0', port=5000, debug=True)

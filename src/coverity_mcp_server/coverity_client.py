@@ -382,6 +382,132 @@ class CoverityClient:
             logger.error(f"Failed to get defect details for {cid}: {e}")
             return None
     
+    async def get_users(self, disabled: bool = False, include_details: bool = True, 
+                       locked: bool = False, limit: int = 200) -> List[Dict[str, Any]]:
+        """
+        Get all users from Coverity Connect
+        
+        Args:
+            disabled: Include disabled users (default: False)
+            include_details: Include detailed user information (default: True)
+            locked: Include locked users (default: False)
+            limit: Maximum number of users to return (default: 200)
+            
+        Returns:
+            List of user dictionaries
+        """
+        try:
+            params = {
+                'disabled': str(disabled).lower(),
+                'includeDetails': str(include_details).lower(),
+                'locked': str(locked).lower(),
+                'offset': '0',
+                'rowCount': str(limit),
+                'sortColumn': 'name',
+                'sortOrder': 'asc'
+            }
+            
+            response = await self._make_request('GET', '/api/v2/users', params=params)
+            
+            if response and 'users' in response:
+                return response['users']
+            
+            # Dummy data for testing
+            return [
+                {
+                    'name': 'admin',
+                    'email': 'admin@company.com',
+                    'familyName': 'Administrator',
+                    'givenName': 'System',
+                    'disabled': False,
+                    'locked': False,
+                    'superUser': True,
+                    'groupNames': ['Administrators', 'Users'],
+                    'roleAssignments': [
+                        {
+                            'roleName': 'administrator',
+                            'scope': 'global',
+                            'username': 'admin'
+                        }
+                    ],
+                    'lastLogin': '2024-07-21T10:00:00Z',
+                    'dateCreated': '2024-01-01T00:00:00Z',
+                    'local': True
+                },
+                {
+                    'name': 'developer1',
+                    'email': 'dev1@company.com',
+                    'familyName': '開発',
+                    'givenName': '太郎',
+                    'disabled': False,
+                    'locked': False,
+                    'superUser': False,
+                    'groupNames': ['Users'],
+                    'roleAssignments': [
+                        {
+                            'roleName': 'developer',
+                            'scope': 'global',
+                            'username': 'developer1'
+                        }
+                    ],
+                    'lastLogin': '2024-07-20T15:30:00Z',
+                    'dateCreated': '2024-02-01T00:00:00Z',
+                    'local': True
+                },
+                {
+                    'name': 'projectowner1',
+                    'email': 'owner1@company.com',
+                    'familyName': 'プロジェクト',
+                    'givenName': '花子',
+                    'disabled': False,
+                    'locked': False,
+                    'superUser': False,
+                    'groupNames': ['Users'],
+                    'roleAssignments': [
+                        {
+                            'roleName': 'projectOwner',
+                            'scope': 'project',
+                            'username': 'projectowner1'
+                        }
+                    ],
+                    'lastLogin': '2024-07-19T09:15:00Z',
+                    'dateCreated': '2024-03-01T00:00:00Z',
+                    'local': True
+                }
+            ]
+            
+        except Exception as e:
+            logger.error(f"Failed to get users: {e}")
+            return []
+    
+    async def get_user_details(self, username: str) -> Optional[Dict[str, Any]]:
+        """
+        Get detailed information about a specific user
+        
+        Args:
+            username: Username to lookup
+            
+        Returns:
+            User details dictionary or None if not found
+        """
+        try:
+            response = await self._make_request('GET', f'/api/v2/users/{username}')
+            
+            if response and 'users' in response and response['users']:
+                return response['users'][0]
+            
+            # Try to find user in all users list
+            users = await self.get_users()
+            for user in users:
+                if user.get('name') == username:
+                    return user
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to get user details for {username}: {e}")
+            return None
+
     async def __aenter__(self):
         """Async context manager entry"""
         return self

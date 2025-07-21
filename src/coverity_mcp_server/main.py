@@ -272,6 +272,114 @@ def create_server() -> FastMCP:
             logger.error(f"Error getting project summary: {e}")
             return {"error": str(e)}
     
+    @mcp.tool()
+    async def list_users(
+        include_disabled: bool = False,
+        limit: int = 200
+    ) -> List[Dict[str, Any]]:
+        """
+        List all users in Coverity Connect
+        
+        Args:
+            include_disabled: Include disabled users (default: False)
+            limit: Maximum number of users to return (default: 200)
+        """
+        try:
+            client = initialize_client()
+            users = await client.get_users(
+                disabled=include_disabled,
+                include_details=True,
+                locked=False,
+                limit=limit
+            )
+            
+            return users if users else []
+            
+        except Exception as e:
+            logger.error(f"Error listing users: {e}")
+            return [{"error": str(e)}]
+    
+    @mcp.tool()
+    async def get_user_details(username: str) -> Dict[str, Any]:
+        """
+        Get detailed information about a specific user
+        
+        Args:
+            username: Username to lookup
+        """
+        try:
+            client = initialize_client()
+            user = await client.get_user_details(username)
+            
+            if not user:
+                return {"error": f"User {username} not found"}
+            
+            return user
+            
+        except Exception as e:
+            logger.error(f"Error getting user details: {e}")
+            return {"error": str(e)}
+    
+    @mcp.tool()
+    async def get_user_roles(username: str) -> Dict[str, Any]:
+        """
+        Get role and permission information for a specific user
+        
+        Args:
+            username: Username to lookup roles for
+        """
+        try:
+            client = initialize_client()
+            user = await client.get_user_details(username)
+            
+            if not user:
+                return {"error": f"User {username} not found"}
+            
+            # Extract role information
+            roles_info = {
+                "username": user.get('name'),
+                "superUser": user.get('superUser', False),
+                "groups": user.get('groupNames', []),
+                "roles": [],
+                "status": {
+                    "disabled": user.get('disabled', False),
+                    "locked": user.get('locked', False),
+                    "local": user.get('local', True)
+                },
+                "lastLogin": user.get('lastLogin'),
+                "dateCreated": user.get('dateCreated')
+            }
+            
+            # Process role assignments
+            for role in user.get('roleAssignments', []):
+                role_info = {
+                    "roleName": role.get('roleName'),
+                    "scope": role.get('scope'),
+                    "roleAssignmentType": role.get('roleAssignmentType', 'user')
+                }
+                
+                # Add description based on role name
+                role_descriptions = {
+                    "administrator": "システム全体の管理権限",
+                    "projectOwner": "プロジェクトの所有者権限", 
+                    "developer": "開発者権限",
+                    "analyst": "分析者権限",
+                    "viewer": "閲覧権限"
+                }
+                
+                role_info["description"] = role_descriptions.get(
+                    role.get('roleName'), 
+                    f"{role.get('roleName')} 権限"
+                )
+                
+                roles_info["roles"].append(role_info)
+            
+            return roles_info
+            
+        except Exception as e:
+            logger.error(f"Error getting user roles: {e}")
+            return {"error": str(e)}
+
     return mcp
 
 def run_server():
