@@ -1,13 +1,13 @@
-# Coverity Connect MCP Server - セットアップガイド
+# Coverity Connect MCP Server - VSCode統合セットアップガイド
 
 ## 概要
 
-このガイドでは、Coverity Connect MCP Serverを本番環境で立ち上げるための完全な手順を説明します。
+このガイドでは、Coverity Connect MCP ServerをVSCode GitHub Copilot Agentと統合するための完全な手順を説明します。
 
 本MCPサーバーは以下の特徴があります：
-- 認証情報やプロキシ設定は環境変数から読み込み（ハードコーディングなし）
-- GitHub Copilot Chatとの統合
-- セキュアな本番環境デプロイメント
+- VSCodeによる自動管理（ターミナル占有なし）
+- GitHub Copilot Agentとの直接統合
+- 環境変数による設定管理（ハードコーディングなし）
 
 ## 前提条件
 
@@ -21,262 +21,390 @@
 - Coverity Connect のユーザー名とパスワード
 - プロキシサーバー情報（必要な場合）
 
-## インストール手順
+## セットアップ構成
 
-### 1. リポジトリのクローン
+セットアップは**サーバー側**（MCPサーバー環境構築）と**クライアント側**（VSCode統合設定）に分かれます。
+
+### Python仮想環境の必要性
+
+**VSCodeターミナルで起動するMCPサーバーには仮想環境が必要です。**
+
+理由：
+- **依存関係の分離**: MCPサーバーの依存パッケージを他のPythonプロジェクトと分離
+- **VSCodeの実行環境**: VSCodeがMCPサーバーを起動する際、指定されたPythonインタープリターを使用
+- **パッケージバージョン管理**: プロジェクト固有のパッケージバージョンを保証
+
+## サーバー側セットアップ（MCPサーバー環境構築）
+
+### 1. リポジトリのクローンと環境準備
 
 ```bash
-git clone https://github.com/keides2/coverity-connect-mcp
+git clone https://github.com/keides2/coverity-connect-mcp.git
 cd coverity-connect-mcp
-```
 
-### 2. Python仮想環境のセットアップ
-
-```bash
+# Python仮想環境のセットアップ
 python -m venv venv
+
+# 仮想環境の有効化
 # Windows
 venv\Scripts\activate
 # Linux/macOS
 source venv/bin/activate
 ```
 
-### 3. 依存関係のインストール
+### 2. パッケージインストール
 
 ```bash
+# 依存関係のインストール
 pip install -r requirements.txt
+
+# パッケージのインストール
+pip install -e .
 ```
 
-## 環境変数の設定
-
-### 必須環境変数
+### 3. インストール確認
 
 ```bash
-# Coverity Connect サーバーのURL
-export COVERITY_HOST="https://your-coverity-server.com"
+# 正常にインストールされたか確認
+python -c "from src.coverity_mcp_server import create_server; print('Import successful')"
 
-# Coverity Connect 認証情報
-export COVAUTHUSER="your_username"
-export COVAUTHKEY="your_password"
+# CLIが動作するか確認
+python -m src.coverity_mcp_server.main --help
 ```
 
-### オプション環境変数
+### 4. 環境変数の設定
+
+#### 方法1: .envファイル作成（推奨）
+
+プロジェクトルートに`.env`ファイルを手作業で作成：
+
+1. **ファイル作成**: プロジェクトルートフォルダで新しいファイルを作成
+2. **ファイル名**: `.env` （ドット付き、拡張子なし）
+3. **内容**: 以下のテンプレートをコピーして実際の値に変更
 
 ```bash
-# プロキシ設定（標準的な環境変数）
-export HTTPS_PROXY="http://your-proxy-server.com:PORT"
-export HTTP_PROXY="http://your-proxy-server.com:PORT"
+# Coverity Connect MCP Server - Environment Variables
+# 本番環境用設定
 
-# または、カスタムプロキシ設定
-export PROXY_HOST="your-proxy-server.com"
-export PROXY_PORT="PORT"
+# 必須: Coverity Connect サーバー設定
+COVERITY_HOST=https://your-coverity-server.com
+COVAUTHUSER=your_username
+COVAUTHKEY=your_actual_password_or_token
+
+# オプション: その他の設定
+COVERITY_PORT=443
+COVERITY_SSL=true
+LOG_LEVEL=INFO
+
+# プロキシ設定（必要に応じて）
+PROXY_HOST=your-proxy-server.com
+PROXY_PORT=your-port
 ```
 
-### 便利な設定方法
+**重要**: 
+- すべての `your_xxx` 部分を実際の値に置き換えてください
+- `COVAUTHKEY`は実際のCoverity Connect**認証キー**または**パスワード**です
 
-環境変数設定用のテンプレートファイルを使用できます：
+#### 方法2: setup_env_template.batを使用（Windows）
+
+プロジェクトに`setup_env_template.bat`がある場合：
 
 ```bash
-# テンプレートファイルをコピーして編集
-cp setup_env_template.bat setup_env.bat
-# setup_env.batを編集して実際の値を設定
-# 実行
+# 1. テンプレートファイルをコピー
+copy setup_env_template.bat setup_env.bat
+
+# 2. setup_env.batファイルを編集
+# テキストエディタでsetup_env.batを開き、以下の箇所を実際の値に変更：
+# - your_coverity_username → 実際のユーザー名
+# - your_password_here → 実際のパスワード/認証キー
+# - your-coverity-server.com → 実際のCoverityサーバーURL
+# - your-proxy-server.com → 実際のプロキシサーバー（必要な場合）
+
+# 3. バッチファイル実行
 setup_env.bat
 ```
 
-## GitHub Copilot Chatとの連携設定
+### 5. サーバー動作確認（推奨）
 
-### VS Code設定ファイルの編集
+VSCode統合前に、MCPサーバーが正常に動作することを確認：
 
-VS Code の settings.json に以下を追加してください：
+```bash
+# 仮想環境内で実際の設定で起動テスト
+python -m src.coverity_mcp_server.main
+```
+
+**期待される正常起動ログ例**:
+```
+Starting Coverity Connect MCP Server...
+=== Configuration Loading ===
+COVERITY_HOST: https://your-coverity-server.com
+COVAUTHUSER: your_username
+COVAUTHKEY: ***
+Parsed URL - Host: your-server, Port: 443, SSL: True
+Coverity client initialized successfully
+```
+
+**※ 確認後、`Ctrl+C`でサーバーを停止してください。**
+VSCode クライアント側がMCPサーバーを自動起動します。
+
+## クライアント側セットアップ（VSCode統合設定）
+
+### 1. VSCode設定ファイルの場所
+
+**Windows:**
+- `%APPDATA%\Code\User\settings.json`
+- または VSCode内で: `Ctrl+Shift+P` → `Preferences: Open User Settings (JSON)`
+
+### 2. MCP設定の追加
+
+`settings.json`に以下を追加してください：
+
+#### Option A: フルパス指定（推奨）
 
 ```json
 {
   "github.copilot.chat.experimental.mcpServers": {
     "coverity-connect": {
-      "command": "python",
-      "args": ["-m", "src.coverity_mcp_server"],
-      "cwd": "C:\\path\\to\\your\\coverity-connect-mcp",
+      "command": "C:/path/to/your/coverity-connect-mcp/venv/Scripts/python.exe",
+      "args": ["-m", "src.coverity_mcp_server.main"],
+      "cwd": "C:/path/to/your/coverity-connect-mcp",
       "env": {
         "COVERITY_HOST": "https://your-coverity-server.com",
+        "COVAUTHUSER": "your_username",
+        "COVAUTHKEY": "your_actual_password_or_token",
         "COVERITY_PORT": "443",
         "COVERITY_SSL": "true",
-        "COVAUTHUSER": "your_username",
-        "COVAUTHKEY": "your_password_or_token",
         "PROXY_HOST": "your-proxy-server.com",
-        "PROXY_PORT": "PORT",
-        "LOG_LEVEL": "INFO",
-        "SSL_VERIFY": "false",
-        "TIMEOUT_SECONDS": "30"
+        "PROXY_PORT": "your-port",
+        "LOG_LEVEL": "INFO"
       }
     }
   }
 }
 ```
 
-### settings.jsonの場所
+#### Option B: 環境変数活用
 
-- **Windows**: `%APPDATA%\Code\User\settings.json`
-- **VS Code内**: `Ctrl+Shift+P` → "Preferences: Open Settings (JSON)"
+```json
+{
+  "github.copilot.chat.experimental.mcpServers": {
+    "coverity-connect": {
+      "command": "python",
+      "args": ["-m", "src.coverity_mcp_server.main"],
+      "cwd": "C:/path/to/your/coverity-connect-mcp",
+      "env": {
+        "PATH": "C:/path/to/your/coverity-connect-mcp/venv/Scripts;${env:PATH}",
+        "VIRTUAL_ENV": "C:/path/to/your/coverity-connect-mcp/venv",
+        "COVERITY_HOST": "https://your-coverity-server.com",
+        "COVAUTHUSER": "your_username",
+        "COVAUTHKEY": "your_actual_password_or_token",
+        "COVERITY_PORT": "443",
+        "COVERITY_SSL": "true",
+        "PROXY_HOST": "your-proxy-server.com",
+        "PROXY_PORT": "your-port",
+        "LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}
+```
 
-### 重要なポイント
+**重要なポイント**:
+1. **Pythonパス**: 仮想環境のPythonを正確に指定
+2. `cwd`パスを実際のプロジェクトディレクトリパスに変更
+3. `COVERITY_HOST`を実際のCoverityサーバーURLに変更
+4. `COVAUTHUSER`を実際のユーザー名に変更
+5. `COVAUTHKEY`を実際の認証情報に変更
+6. プロキシ設定を環境に合わせて調整（不要な場合は削除）
 
-1. **COVERITY_HOST**: 実際のCoverityサーバーURLに置き換えてください（`https://` プロトコルを含める）
-2. **COVAUTHUSER**: 実際のCoverityユーザー名に置き換えてください
-3. **COVAUTHKEY**: 実際のCoverityパスワードまたはトークンに置き換えてください
-4. **cwd**: プロジェクトの実際のパスに置き換えてください
-5. **プロキシ設定**: 必要に応じて `PROXY_HOST` と `PROXY_PORT` を実際の値に設定してください
+※環境変数を読み込めない場合があります
 
-⚠️ **セキュリティ注意**: settings.jsonを編集する際は、実際の認証情報をGitHubにプッシュしないよう注意してください。
+### 3. VSCodeの再起動
 
-💡 **重要なヒント**: 環境変数が正しく読み込まれない場合があります。その場合は、VS Code settings.jsonの`env`セクションに直接値を記述することで確実に動作します。
+1. `settings.json`を保存
+2. VSCodeを完全終了（タスクマネージャーから終了）
+3. VSCodeを再起動
 
-## 本番環境デプロイメント
+## 推奨セットアップフロー
 
-### 自動デプロイメント（推奨）
-
-本番環境への切り替えは自動化されています：
+### ステップ1: サーバー側準備
 
 ```bash
-# 本番用ファイルに切り替え
-deploy_production.bat
+# 1. 環境構築
+git clone https://github.com/keides2/coverity-connect-mcp.git
+cd coverity-connect-mcp
+python -m venv venv
+venv\Scripts\activate  # Windows
+
+# 2. パッケージインストール  
+pip install -r requirements.txt
+pip install -e .
+
+# 3. 環境設定
+# .envファイル作成・編集
+
+# 4. 動作テスト
+python -m src.coverity_mcp_server.main
 ```
 
-このスクリプトは以下を実行します：
-1. 現在のファイルをバックアップ
-2. 本番用ファイルをメインファイルに変更
-3. 環境変数の設定指示を表示
-
-### 手動デプロイメント
-
-手動で行う場合：
+### ステップ2: クライアント側設定
 
 ```bash
-# 1. 現在のファイルをバックアップ
-mv src/coverity_mcp_server/main.py src/coverity_mcp_server/main_dev.py
-mv src/coverity_mcp_server/coverity_client.py src/coverity_mcp_server/coverity_client_dev.py
+# 1. VSCode settings.json編集
+# - 仮想環境のPythonパスを正確に指定
+# - cwdパスを正確に指定
 
-# 2. 本番用ファイルをメインファイルに変更
-cp src/coverity_mcp_server/main_production.py src/coverity_mcp_server/main.py
-cp src/coverity_mcp_server/coverity_client_production.py src/coverity_mcp_server/coverity_client.py
+# 2. VSCode再起動
+
+# 3. 統合テスト
+# GitHub Copilot Chatで接続確認
 ```
 
-## 起動と動作確認
+## 動作確認
 
-### サーバーの起動
+### 1. GitHub Copilot Chatでの接続確認
 
-```bash
-# 本番環境用起動スクリプト
-start_production.bat
-
-# または手動起動
-python -m src.coverity_mcp_server
-```
-
-### VS Codeでの確認
-
-1. settings.json を保存
-2. VS Code を完全終了
-3. VS Code を再起動
-4. GitHub Copilot Chat で接続テスト
-
-### 動作確認コマンド
-
-GitHub Copilot Chatで以下を実行：
+VSCode内でGitHub Copilot Chatを開き、以下をテストしてください：
 
 ```
-Coverity MCPサーバーの現在の設定を教えてください
+Coverity MCPサーバーに接続できていますか？利用可能なツールとリソースを教えてください
 ```
 
-期待される出力例：
+**期待される応答**:
+
+- MCPサーバーへの接続確認
+- 利用可能なツール一覧（search_defects、list_projects等）
+- 利用可能なリソース一覧
+
+
+**補足**:
+
+- VSCodeの自動管理について
+  - VSCodeが自動的に行うこと:
+  - MCPサーバーの自動起動: `GitHub Copilot Chat`を使用する際に、設定されたMCPサーバーを自動的にバックグラウンドで起動
+  - プロセス管理: MCPサーバーのプロセスをVSCode内で管理
+  - 自動停止: `VSCode`を終了すると、MCPサーバーも自動的に停止
+
+- あなたが手動でやる必要がないこと:
+  - ターミナルでMCPサーバーを起動する
+  - MCPサーバーを手動で停止する
+  - 仮想環境を手動で有効化する（VSCodeが設定に従って実行）
+
+- 具体的な接続フロー:
+
+  1. VSCode再起動後
+  `VSCode`起動 → `settings.json`読み込み → MCP設定認識
+  1. GitHub Copilot Chat使用時
+  `Copilot Chat`開く → MCPサーバー自動起動 → Coverity接続確立
+  1. バックグラウンドで実行されるコマンド
+  
+  ```bash
+  # VSCodeが内部的に実行（ユーザーには見えない）
+  cd C:/path/to/your/coverity-connect-mcp
+  C:/path/to/your/coverity-connect-mcp/venv/Scripts/python.exe -m src.coverity_mcp_server.main
+  ```
+
+- 環境変数は、`VSCode` `settings.json`の環境変数をサーバー側`.env`ファイルと完全に一致させてください。
+- AIモデルは、ChatGPT 4.1で問題ありません。 MCPプロトコルは言語モデルに依存しません。
+
+
+### 2. 実際のCoverityデータアクセステスト
+
 ```
-COVERITY_HOST: https://your-coverity-server.com
-Using HTTP proxy: http://your-proxy-server.com:PORT
+Coverityのプロジェクト一覧を取得してください
 ```
+
+```
+Coverityで重要度がHighの欠陥を検索してください
+```
+
+## VSCode統合の利点
+
+### ターミナル管理
+- **ターミナル占有なし**: VSCodeがバックグラウンドでMCPサーバーを管理
+- **自動開始/停止**: 必要な時だけサーバーが動作
+- **複数ターミナル利用可能**: 開発作業用のターミナルは自由に使用可能
+
+### 開発効率
+- **シームレス統合**: GitHub Copilot Chatから直接Coverityにアクセス
+- **設定管理**: settings.jsonで集中管理
+- **デバッグ**: VSCode Output パネルでMCPサーバーのログ確認可能
 
 ## トラブルシューティング
 
-### ⚠️ 重要：環境変数が既定値に上書きされる問題
+### サーバー側準備段階でのエラー
 
-**症状**: 環境変数を正しく設定しているにも関わらず、サーバーが既定値やハードコーディングされた値を使用してしまう。
-
-**原因**: 
-- コード内の既定値の設定順序の問題
-- 環境変数の読み込みタイミングの問題
-- Python仮想環境やプロセスの環境変数継承の問題
-
-**解決方法**:
-
-1. **環境変数の優先順位確認**: 
-   ```bash
-   # 実行前に環境変数が正しく設定されているか確認
-   echo $COVERITY_HOST        # Linux/macOS
-   echo %COVERITY_HOST%       # Windows
-   ```
-
-2. **VS Code設定での直接指定**（推奨）:
-   settings.jsonの`env`セクションで直接値を指定することで、確実に設定値が使用されます。
-
-3. **最終手段 - 直書き対応**:
-   環境変数が機能しない場合は、一時的に以下のファイルに直接値を記述：
-   ```
-   src/coverity_mcp_server/main.py
-   src/coverity_mcp_server/coverity_client.py
-   ```
-   
-   ⚠️ **注意**: 直書きした場合は、GitHubプッシュ前に必ず値を削除またはテンプレート化してください。
-   
-   ⚠️ **重要**: プロジェクトのルートディレクトリ（coverity-connect-mcp/）から実行してください。
-
-4. **デバッグ方法**:
-   サーバー起動時のログで実際に使用されている値を確認：
-   ```
-   COVERITY_HOST: [実際の値]
-   Using HTTP proxy: [実際のプロキシ設定]
-   ```
-
-### 環境変数が設定されていない場合
-
-エラーメッセージ例：
-```
-Missing required environment variables: COVERITY_HOST, COVAUTHUSER, COVAUTHKEY
-Please set the following environment variables:
-  COVERITY_HOST - Coverity Connect server URL
-  COVAUTHUSER - Coverity Connect username
-  COVAUTHKEY - Coverity Connect password/token
+#### インポートエラーの場合
+```bash
+# パッケージの再インストール
+pip install -e . --force-reinstall
 ```
 
-**解決方法**: 上記の環境変数設定セクションを参照してください。
+#### 依存関係エラーの場合  
+```bash
+# 依存関係の更新
+pip install --upgrade pip
+pip install -r requirements.txt --upgrade
+```
 
-### 接続エラーの場合
+#### 環境変数エラーの場合
+```bash
+# PowerShellで環境変数確認（Windows）
+Get-Content .env
+# .envファイルの内容と実際の値を確認
+```
 
-1. **プロキシ設定の確認**: プロキシサーバーのURLとポートが正しいか確認
-2. **認証情報の確認**: ユーザー名とパスワードが正しいか確認
-3. **サーバーURL確認**: CoverityサーバーのURLが正しく、`https://`プロトコルが含まれているか確認
+### MCP接続エラーの場合
 
-### VS Code設定の問題
+1. **VSCode Output パネル確認**
+   - `View` → `Output` → `GitHub Copilot Chat` を選択
+   - MCPサーバーのエラーログを確認
 
-1. settings.jsonの構文が正しいか確認（JSONフォーマット）
-2. パスの区切り文字が正しいか確認（Windowsの場合は`\\`）
-3. VS Codeの完全再起動
+2. **設定確認**
+   - settings.jsonの構文が正しいか確認
+   - Pythonパス設定が正確か確認（仮想環境のpython.exe）
+   - cwdパス設定が正確か確認
+   - 環境変数の値が正しいか確認
+
+3. **VSCode完全再起動**
+   - 設定変更後は必ず完全再起動
+
+### 認証エラーの場合
+
+```
+Coverity Connect への認証に失敗しました
+```
+
+- `COVAUTHKEY`が正しく設定されているか確認
+- Coverity Connect サーバーへの接続可能性を確認
+
+### プロキシエラーの場合
+
+- `PROXY_HOST`と`PROXY_PORT`の設定を確認
+- 企業ネットワークの設定を確認
 
 ## セキュリティ考慮事項
 
-- **認証情報の保護**: パスワードや認証キーは環境変数またはセキュアなシークレット管理システムを使用
-- **ログ出力**: パスワードはログに出力されず、マスクされます
-- **プロキシ設定**: プロキシ設定も環境変数から読み込まれ、コードに埋め込まれていません
-- **GitHub統合**: 本番用ファイルをGitHubにプッシュすることで、機密情報が含まれない安全なコードのみが保存されます
+- **認証情報の保護**: settings.jsonは個人設定ファイルのため、チーム共有しない
+- **バージョン管理**: `.env`ファイルは`.gitignore`に含まれており、GitHubにプッシュされない
+- **ログ出力**: パスワードはログに出力されず、マスクされる
 
-## 参考資料
+## 利用可能なMCPツール
 
-### 詳細ドキュメント
-- `docs/system_architecture_design.md` - システムアーキテクチャ
-- `docs/function_specifications.md` - 関数仕様書
-- `docs/api.md` - API仕様
+| ツール | 説明 | 使用例 |
+|--------|------|-------|
+| `search_defects` | 欠陥の高度検索 | 高重要度セキュリティ脆弱性の検索 |
+| `get_defect_details` | 特定欠陥の詳細分析 | 欠陥の根本原因分析と修正手順 |
+| `list_projects` | プロジェクト一覧取得 | プロジェクトインベントリとアクセス確認 |
+| `list_streams` | ストリーム一覧取得 | ストリームベースの分析計画 |
+| `get_project_summary` | プロジェクト包括分析 | エグゼクティブレベルの品質レポート |
+| `list_users` | ユーザー一覧取得 | ユーザー管理とアクセス制御 |
+| `get_user_details` | ユーザー詳細情報 | 個別ユーザーの権限確認 |
+| `get_user_roles` | ユーザー権限分析 | セキュリティ監査とアクセス制御レビュー |
 
-### 開発者向け
-- `docs/Contributing Guide.pdf` - 開発貢献ガイド
-- `docs/project_completion_plan.md` - プロジェクト計画
+---
 
-### トラブルシューティング
-- 問題が解決しない場合は、プロジェクトのIssueページで報告してください
-- `test/`フォルダ内の実際の設定ファイルも参考にしてください
+**このガイドにより、VSCodeとGitHub Copilot Agentを使用してCoverity Connectに自然言語でアクセスできるようになります。ターミナルを占有せず、シームレスな開発体験を提供します。**
+
+---
+2025/07/24 keides2 初版
