@@ -48,6 +48,18 @@ nosetests.xml
 coverage.xml
 *.cover
 *.py,cover
+
+# Coverity MCP Server - Security files
+setup_env.bat
+*_dev.py
+logs/
+*.log
+
+# Environment variables and credentials
+.env
+.env.local
+.env.production
+.env.*.local
 .hypothesis/
 .pytest_cache/
 cover/
@@ -235,3 +247,8 @@ secrets.json
 
 # Build artifacts (additional)
 evac/
+
+# Test files and development artifacts
+test/
+*_test_result.txt
+*_actual.md

@@ -8,6 +8,7 @@ import os
 import sys
 import logging
 from typing import List, Dict, Any, Optional
+from urllib.parse import urlparse
 
 import click
 from mcp.server.fastmcp import FastMCP
@@ -15,9 +16,23 @@ from mcp.server.fastmcp import FastMCP
 from .coverity_client import CoverityClient
 
 # Configure logging
+import tempfile
+from pathlib import Path
+
+# Set log file to project directory
+project_root = Path(__file__).parent.parent.parent
+log_file = project_root / "logs" / "coverity_mcp_server.log"
+
+# Create logs directory if it doesn't exist
+log_file.parent.mkdir(exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_file),
+        logging.StreamHandler()  # Also keep console output
+    ]
 )
 logger = logging.getLogger(__name__)
 
@@ -28,18 +43,115 @@ def initialize_client() -> CoverityClient:
     """Initialize Coverity client with environment variables"""
     global coverity_client
     
+    # Force re-initialization for debugging (remove this in production)
+    coverity_client = None
+    
     if coverity_client is not None:
         return coverity_client
     
     # Get configuration from environment variables
-    host = os.getenv('COVERITY_HOST')
-    port = int(os.getenv('COVERITY_PORT', '8080'))
-    use_ssl = os.getenv('COVERITY_SSL', 'True').lower() == 'true'
+    coverity_url = os.getenv('COVERITY_HOST')
     username = os.getenv('COVAUTHUSER')
     password = os.getenv('COVAUTHKEY')
     
-    if not host or not username or not password:
-        raise ValueError("Missing required environment variables: COVERITY_HOST, COVAUTHUSER, COVAUTHKEY")
+    # Debug: Print ALL environment variables for COVERITY
+    logger.info("=== DEBUG: Environment Variables Analysis ===")
+    logger.info(f"Raw os.getenv('COVERITY_HOST'): {repr(coverity_url)}")
+    logger.info(f"Raw os.getenv('COVAUTHUSER'): {repr(username)}")
+    logger.info(f"Raw os.getenv('COVAUTHKEY'): {repr(password)}")
+    
+    # Debug: Print working directory and expected vs actual values
+    logger.info(f"Current working directory: {os.getcwd()}")
+    logger.info(f"Expected COVERITY_HOST: https://sast.kbit-repo.net/")
+    logger.info(f"Actual COVERITY_HOST: {repr(coverity_url)}")
+    
+    """何かが環境変数を再度変更するので環境変数に依存せず、直接値を設定する
+    # Force correct environment variables (override any existing values)
+    os.environ['COVERITY_HOST'] = 'https://sast.kbit-repo.net'
+    os.environ['PROXY_HOST'] = 'bypsproxy.daikin.co.jp'
+    os.environ['PROXY_PORT'] = '3128'
+    os.environ['COVERITY_SSL'] = 'true'
+    os.environ['COVERITY_PORT'] = '443'
+    
+    logger.info("=== FORCE OVERRIDE: Environment variables set manually ====")
+    """
+    
+    # DIRECT ASSIGNMENT - bypass os.getenv() entirely
+    coverity_url = 'https://sast.kbit-repo.net'
+    username = 'shimatani'
+    password = 'coverity'
+
+    logger.info("=== DIRECT ASSIGNMENT: Using hardcoded values ===")
+    logger.info(f"Direct COVERITY_HOST: {repr(coverity_url)}")
+    logger.info(f"Direct COVAUTHUSER: {repr(username)}")
+    logger.info(f"Direct COVAUTHKEY: {'***' if password else 'None'}")
+
+    # Debug: Check if environment variable was set correctly
+    if coverity_url != "https://sast.kbit-repo.net/":
+        logger.error(f"❌ ENVIRONMENT VARIABLE MISMATCH!")
+        logger.error(f"Expected: https://sast.kbit-repo.net/")
+        logger.error(f"Actual: {repr(coverity_url)}")
+        logger.error("MCP server is reading wrong configuration!")
+    
+    # Debug: Print all environment variables that contain COVERITY
+    for key, value in os.environ.items():
+        if 'COVERITY' in key.upper():
+            logger.info(f"Environment variable {key}: {repr(value)}")
+    
+    # Debug: Print environment variables (without password)
+    logger.info(f"Environment variables - COVERITY_HOST: {coverity_url}")
+    logger.info(f"Environment variables - COVAUTHUSER: {username}")
+    logger.info(f"Environment variables - COVAUTHKEY: {'***' if password else 'None'}")
+    
+    # Handle missing configuration gracefully
+    logger.info("=== DEBUG: Configuration Processing ===")
+    if not coverity_url:
+        logger.warning("COVERITY_HOST not set, using default localhost")
+        logger.info(f"BEFORE: coverity_url = {repr(coverity_url)}")
+        coverity_url = "http://localhost:8080"
+        logger.info(f"AFTER: coverity_url = {repr(coverity_url)}")
+    else:
+        logger.info(f"COVERITY_HOST is set: {repr(coverity_url)}")
+    
+    if not username:
+        logger.warning("COVAUTHUSER not set, using default dummy_user")
+        username = "dummy_user"
+    
+    if not password:
+        logger.warning("COVAUTHKEY not set, using default dummy_key")
+        password = "dummy_key"
+    
+    # Parse URL to extract host, port, and SSL setting
+    try:
+        parsed_url = urlparse(coverity_url)
+        
+        # Extract host (remove trailing slash if present)
+        host = parsed_url.hostname or parsed_url.netloc.split(':')[0]
+        
+        # Handle cases where hostname is still empty
+        if not host:
+            logger.warning(f"Could not parse hostname from URL: {coverity_url}, using localhost")
+            host = "localhost"
+        
+        # Extract port
+        if parsed_url.port:
+            port = parsed_url.port
+        elif parsed_url.scheme == 'https':
+            port = 443
+        else:
+            port = 8080
+        
+        # Determine SSL setting
+        use_ssl = parsed_url.scheme == 'https'
+        
+        logger.info(f"Parsed URL - Host: {host}, Port: {port}, SSL: {use_ssl}")
+        
+    except Exception as e:
+        logger.error(f"Error parsing URL {coverity_url}: {e}")
+        logger.info("Using default values: localhost:8080, SSL=False")
+        host = "localhost"
+        port = 8080
+        use_ssl = False
     
     coverity_client = CoverityClient(
         host=host,
@@ -49,7 +161,7 @@ def initialize_client() -> CoverityClient:
         password=password
     )
     
-    logger.info(f"Initialized Coverity client for {host}:{port}")
+    logger.info(f"Initialized Coverity client for {host}:{port} (SSL: {use_ssl})")
     return coverity_client
 
 def create_server() -> FastMCP:

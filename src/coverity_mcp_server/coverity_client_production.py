@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Coverity Connect API Client
+Coverity Connect API Client - Production Version
 Provides async interface for interacting with Coverity Connect (Black Duck) REST API
+This version uses environment variables for proxy configuration without hardcoded values.
 """
 
 import aiohttp
@@ -11,6 +12,7 @@ import logging
 from typing import List, Dict, Any, Optional
 from urllib.parse import urljoin
 import ssl
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -61,14 +63,24 @@ class CoverityClient:
             # Create session with timeout
             timeout = aiohttp.ClientTimeout(total=30)
             
-            # Configure proxy if available
+            # Configure proxy from environment variables
             proxy = None
-            proxy_auth = None
             
             # Check for proxy settings from environment
-            import os
             http_proxy = os.getenv('HTTP_PROXY') or os.getenv('http_proxy')
             https_proxy = os.getenv('HTTPS_PROXY') or os.getenv('https_proxy')
+            
+            # If no standard proxy environment variables are set, check for custom ones
+            if not http_proxy and not https_proxy:
+                proxy_host = os.getenv('PROXY_HOST')
+                proxy_port = os.getenv('PROXY_PORT')
+                if proxy_host and proxy_port:
+                    proxy_url = f'http://{proxy_host}:{proxy_port}'
+                    if self.use_ssl:
+                        https_proxy = proxy_url
+                    else:
+                        http_proxy = proxy_url
+                    logger.info(f"Using custom proxy configuration: {proxy_url}")
             
             if self.use_ssl and https_proxy:
                 proxy = https_proxy
@@ -123,10 +135,20 @@ class CoverityClient:
             if data:
                 kwargs['json'] = data
             
-            # Configure proxy for this request
-            import os
+            # Configure proxy for this request from environment variables
             http_proxy = os.getenv('HTTP_PROXY') or os.getenv('http_proxy')
             https_proxy = os.getenv('HTTPS_PROXY') or os.getenv('https_proxy')
+            
+            # If no standard proxy environment variables, check custom ones
+            if not http_proxy and not https_proxy:
+                proxy_host = os.getenv('PROXY_HOST')
+                proxy_port = os.getenv('PROXY_PORT')
+                if proxy_host and proxy_port:
+                    proxy_url = f'http://{proxy_host}:{proxy_port}'
+                    if self.use_ssl:
+                        https_proxy = proxy_url
+                    else:
+                        http_proxy = proxy_url
             
             if self.use_ssl and https_proxy:
                 kwargs['proxy'] = https_proxy
@@ -174,39 +196,12 @@ class CoverityClient:
                     return response['projects']
                 elif 'viewContentsV1' in response:
                     return response['viewContentsV1'].get('projects', [])
-                else:
-                    # Dummy data for testing
-                    return [
-                        {
-                            'projectKey': 'test-project-1',
-                            'projectName': 'Test Project 1',
-                            'description': 'First test project',
-                            'createdDate': '2024-01-01T00:00:00Z',
-                            'lastModified': '2024-01-15T10:30:00Z'
-                        },
-                        {
-                            'projectKey': 'test-project-2', 
-                            'projectName': 'Test Project 2',
-                            'description': 'Second test project',
-                            'createdDate': '2024-01-10T00:00:00Z',
-                            'lastModified': '2024-01-20T15:45:00Z'
-                        }
-                    ]
             
             return []
             
         except Exception as e:
             logger.error(f"Failed to get projects: {e}")
-            # Return dummy data for testing
-            return [
-                {
-                    'projectKey': 'dummy-project',
-                    'projectName': 'Dummy Project',
-                    'description': 'Test project for development',
-                    'createdDate': '2024-01-01T00:00:00Z',
-                    'lastModified': '2024-01-01T00:00:00Z'
-                }
-            ]
+            raise
     
     async def get_project(self, project_id: str) -> Optional[Dict[str, Any]]:
         """
@@ -229,7 +224,7 @@ class CoverityClient:
             
         except Exception as e:
             logger.error(f"Failed to get project {project_id}: {e}")
-            return None
+            raise
     
     async def get_streams(self, project_id: str = "") -> List[Dict[str, Any]]:
         """
@@ -255,36 +250,12 @@ class CoverityClient:
                     return response['streams']
                 elif 'viewContentsV1' in response:
                     return response['viewContentsV1'].get('streams', [])
-                else:
-                    # Dummy data for testing
-                    return [
-                        {
-                            'name': 'main-stream',
-                            'description': 'Main development stream',
-                            'projectId': project_id or 'test-project-1',
-                            'language': 'MIXED'
-                        },
-                        {
-                            'name': 'feature-stream',
-                            'description': 'Feature development stream',  
-                            'projectId': project_id or 'test-project-1',
-                            'language': 'MIXED'
-                        }
-                    ]
             
             return []
             
         except Exception as e:
             logger.error(f"Failed to get streams: {e}")
-            # Return dummy data
-            return [
-                {
-                    'name': 'dummy-stream',
-                    'description': 'Test stream for development',
-                    'projectId': project_id or 'dummy-project',
-                    'language': 'MIXED'
-                }
-            ]
+            raise
     
     async def get_defects(self, stream_id: str = "", query: str = "", 
                          filters: Dict[str, str] = None, 
@@ -322,51 +293,12 @@ class CoverityClient:
                     return response['issues']
                 elif 'viewContentsV1' in response:
                     return response['viewContentsV1'].get('issues', [])
-                else:
-                    # Dummy data for testing
-                    return [
-                        {
-                            'cid': '12345',
-                            'checkerName': 'NULL_RETURNS',
-                            'displayType': 'Null pointer dereference',
-                            'displayImpact': 'High',
-                            'displayStatus': 'New',
-                            'displayFile': 'src/main.c',
-                            'displayFunction': 'main',
-                            'firstDetected': '2024-01-15T10:00:00Z',
-                            'streamId': stream_id or 'main-stream'
-                        },
-                        {
-                            'cid': '12346', 
-                            'checkerName': 'RESOURCE_LEAK',
-                            'displayType': 'Resource leak',
-                            'displayImpact': 'Medium',
-                            'displayStatus': 'Triaged',
-                            'displayFile': 'src/utils.c',
-                            'displayFunction': 'cleanup',
-                            'firstDetected': '2024-01-16T14:30:00Z',
-                            'streamId': stream_id or 'main-stream'
-                        }
-                    ]
             
             return []
             
         except Exception as e:
             logger.error(f"Failed to get defects: {e}")
-            # Return dummy data
-            return [
-                {
-                    'cid': 'dummy-123',
-                    'checkerName': 'TEST_CHECKER',
-                    'displayType': 'Test defect',
-                    'displayImpact': 'Low',
-                    'displayStatus': 'New',
-                    'displayFile': 'test.c',
-                    'displayFunction': 'test_function',
-                    'firstDetected': '2024-01-01T00:00:00Z',
-                    'streamId': stream_id or 'dummy-stream'
-                }
-            ]
+            raise
     
     async def get_defect_details(self, cid: str) -> Optional[Dict[str, Any]]:
         """
@@ -379,34 +311,12 @@ class CoverityClient:
             Detailed defect information or None if not found
         """
         try:
-            endpoint = f'/api/viewContents/issues/v1/{cid}'
+            endpoint = f'/api/v2/issues/{cid}'
             response = await self._make_request('GET', endpoint)
             
             if response:
                 return response
-            
-            # Dummy data for testing
-            return {
-                'cid': cid,
-                'checkerName': 'NULL_RETURNS',
-                'displayType': 'Null pointer dereference',
-                'displayImpact': 'High',
-                'displayStatus': 'New',
-                'displayFile': 'src/main.c',
-                'displayFunction': 'main',
-                'firstDetected': '2024-01-15T10:00:00Z',
-                'streamId': 'main-stream',
-                'occurrenceCount': 1,
-                'events': [
-                    {
-                        'eventNumber': 1,
-                        'eventTag': 'assignment',
-                        'eventDescription': 'Null assignment detected',
-                        'fileName': 'src/main.c',
-                        'lineNumber': 42
-                    }
-                ]
-            }
+            return None
             
         except Exception as e:
             logger.error(f"Failed to get defect details for {cid}: {e}")
@@ -439,145 +349,14 @@ class CoverityClient:
             
             response = await self._make_request('GET', '/api/v2/users', params=params)
             
-            logger.info(f"Users API response type: {type(response)}")
-            logger.info(f"Users API response keys: {response.keys() if isinstance(response, dict) else 'Not a dict'}")
-            
             if response and 'users' in response:
-                logger.info(f"Found {len(response['users'])} users in response")
                 return response['users']
             
-            logger.warning("No 'users' key in response, returning dummy data for debugging")
-            logger.debug(f"Full response: {response}")
-            
-            # Dummy data for testing
-            return [
-                {
-                    'name': 'admin',
-                    'email': 'admin@company.com',
-                    'familyName': 'Administrator',
-                    'givenName': 'System',
-                    'disabled': False,
-                    'locked': False,
-                    'superUser': True,
-                    'groupNames': ['Administrators', 'Users'],
-                    'roleAssignments': [
-                        {
-                            'roleName': 'administrator',
-                            'scope': 'global',
-                            'username': 'admin'
-                        }
-                    ],
-                    'lastLogin': '2024-07-21T10:00:00Z',
-                    'dateCreated': '2024-01-01T00:00:00Z',
-                    'local': True
-                },
-                {
-                    'name': 'developer1',
-                    'email': 'dev1@company.com',
-                    'familyName': '開発',
-                    'givenName': '太郎',
-                    'disabled': False,
-                    'locked': False,
-                    'superUser': False,
-                    'groupNames': ['Users'],
-                    'roleAssignments': [
-                        {
-                            'roleName': 'developer',
-                            'scope': 'global',
-                            'username': 'developer1'
-                        }
-                    ],
-                    'lastLogin': '2024-07-20T15:30:00Z',
-                    'dateCreated': '2024-02-01T00:00:00Z',
-                    'local': True
-                },
-                {
-                    'name': 'projectowner1',
-                    'email': 'owner1@company.com',
-                    'familyName': 'プロジェクト',
-                    'givenName': '花子',
-                    'disabled': False,
-                    'locked': False,
-                    'superUser': False,
-                    'groupNames': ['Users'],
-                    'roleAssignments': [
-                        {
-                            'roleName': 'projectOwner',
-                            'scope': 'project',
-                            'username': 'projectowner1'
-                        }
-                    ],
-                    'lastLogin': '2024-07-19T09:15:00Z',
-                    'dateCreated': '2024-03-01T00:00:00Z',
-                    'local': True
-                }
-            ]
+            return []
             
         except Exception as e:
             logger.error(f"Failed to get users: {e}")
-            # Return dummy data for testing (consistent with other methods)
-            return [
-                {
-                    'name': 'admin',
-                    'email': 'admin@company.com',
-                    'familyName': 'Administrator',
-                    'givenName': 'System',
-                    'disabled': False,
-                    'locked': False,
-                    'superUser': True,
-                    'groupNames': ['Administrators', 'Users'],
-                    'roleAssignments': [
-                        {
-                            'roleName': 'administrator',
-                            'scope': 'global',
-                            'username': 'admin'
-                        }
-                    ],
-                    'lastLogin': '2024-07-21T10:00:00Z',
-                    'dateCreated': '2024-01-01T00:00:00Z',
-                    'local': True
-                },
-                {
-                    'name': 'developer1',
-                    'email': 'dev1@company.com',
-                    'familyName': '開発',
-                    'givenName': '太郎',
-                    'disabled': False,
-                    'locked': False,
-                    'superUser': False,
-                    'groupNames': ['Users'],
-                    'roleAssignments': [
-                        {
-                            'roleName': 'developer',
-                            'scope': 'global',
-                            'username': 'developer1'
-                        }
-                    ],
-                    'lastLogin': '2024-07-20T15:30:00Z',
-                    'dateCreated': '2024-02-01T00:00:00Z',
-                    'local': True
-                },
-                {
-                    'name': 'projectowner1',
-                    'email': 'owner1@company.com',
-                    'familyName': 'プロジェクト',
-                    'givenName': '花子',
-                    'disabled': False,
-                    'locked': False,
-                    'superUser': False,
-                    'groupNames': ['Users'],
-                    'roleAssignments': [
-                        {
-                            'roleName': 'projectOwner',
-                            'scope': 'project',
-                            'username': 'projectowner1'
-                        }
-                    ],
-                    'lastLogin': '2024-07-19T09:15:00Z',
-                    'dateCreated': '2024-03-01T00:00:00Z',
-                    'local': True
-                }
-            ]
+            raise
     
     async def get_user_details(self, username: str) -> Optional[Dict[str, Any]]:
         """
@@ -617,13 +396,29 @@ class CoverityClient:
 
 # Utility functions for testing
 async def test_client():
-    """Test the Coverity client with dummy data"""
+    """Test the Coverity client"""
+    # Get configuration from environment
+    host = os.getenv('COVERITY_HOST', 'localhost')
+    username = os.getenv('COVAUTHUSER', 'test_user')
+    password = os.getenv('COVAUTHKEY', 'test_password')
+    
+    if host.startswith('http'):
+        from urllib.parse import urlparse
+        parsed = urlparse(host)
+        actual_host = parsed.hostname or 'localhost'
+        port = parsed.port or (443 if parsed.scheme == 'https' else 8080)
+        use_ssl = parsed.scheme == 'https'
+    else:
+        actual_host = host
+        port = 8080
+        use_ssl = False
+    
     client = CoverityClient(
-        host="localhost",
-        port=5000,
-        use_ssl=False,
-        username="dummy_user",
-        password="dummy_key"
+        host=actual_host,
+        port=port,
+        use_ssl=use_ssl,
+        username=username,
+        password=password
     )
     
     try:
