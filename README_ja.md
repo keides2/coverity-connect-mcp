@@ -204,6 +204,12 @@ services:
 
 ## 📚 ドキュメント
 
+### 🚀 クイックスタート
+
+- **[本番環境セットアップガイド](docs/GETTING_STARTED.md)** - 📋 本番環境での完全な立ち上げ手順
+
+### 詳細ドキュメント
+
 - **[インストールガイド](docs/ja/installation.md)** - 詳細なセットアップ手順
 - **[設定リファレンス](docs/ja/configuration.md)** - 完全な設定オプション
 - **[APIリファレンス](docs/ja/api.md)** - 包括的なAPIドキュメント

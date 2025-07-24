@@ -204,18 +204,21 @@ Show me the permissions and role assignments for user "developer1" and identify 
 
 ## 📚 Documentation
 
+### 🚀 Quick Start
+- **[Getting Started Guide](docs/GETTING_STARTED.md)** - 📋 Complete setup guide for production environments
+- **[Setup Guide](SETUP_GUIDE.md)** - Complete development to production setup
+
 ### English
 - **[Installation Guide](docs/installation.md)** - Detailed setup instructions for all platforms
 - **[Configuration Reference](docs/configuration.md)** - Complete configuration options and security settings
 - **[API Reference](docs/api.md)** - Comprehensive API documentation with examples
-- **[Setup Guide](SETUP_GUIDE.md)** - Complete development to production setup
 - **[Usage Examples](examples/)** - Environment-specific configurations and examples
 
 ### 日本語 (Japanese)
+- **[本番環境セットアップガイド](docs/GETTING_STARTED.md)** - 📋 本番環境での完全な立ち上げ手順
 - **[インストールガイド](docs/ja/installation.md)** - 詳細なセットアップ手順（全プラットフォーム対応）
 - **[設定リファレンス](docs/ja/configuration.md)** - 完全な設定オプションとセキュリティ設定
 - **[API リファレンス](docs/ja/api.md)** - 包括的なAPI仕様書と使用例
-- **[セットアップガイド](SETUP_GUIDE.md)** - 開発から本番環境までの完全セットアップ
 - **[使用例](examples/)** - 環境別設定とサンプル
 
 > 🌐 **多言語サポート**: 英語と日本語の完全ドキュメントを提供しています。すべてのガイドにはステップバイステップの手順、トラブルシューティングのヒント、実用的な例が含まれています。

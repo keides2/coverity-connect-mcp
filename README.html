@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>README.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="coverity-connect-mcp-server">Coverity Connect MCP Server</h1>
+<img src="top.png" alt="Coverity Connect MCP Server" width="700">
+<!-- [![PyPI version](https://badge.fury.io/py/coverity-connect-mcp.svg)](https://badge.fury.io/py/coverity-connect-mcp) -->
+<!-- [![Python Support](https://img.shields.io/pypi/pyversions/coverity-connect-mcp.svg)](https://pypi.org/project/coverity-connect-mcp/) -->
+<p><a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a><br>
+<a href="https://github.com/keides2/coverity-connect-mcp/actions"><img src="https://github.com/keides2/coverity-connect-mcp/workflows/Tests/badge.svg" alt="Tests"></a><br>
+<a href="https://codecov.io/gh/keides2/coverity-connect-mcp"><img src="https://codecov.io/gh/keides2/coverity-connect-mcp/branch/main/graph/badge.svg" alt="Coverage"></a></p>
+<p><strong>English</strong> | <a href="README_ja.md">日本語</a></p>
+<p>A <strong>Model Context Protocol (MCP) server</strong> that provides seamless integration between AI assistants (like Claude Desktop) and <strong>Black Duck Coverity Connect</strong> static analysis platform.</p>
+<p>Transform your Coverity workflow with natural language commands and automated analysis through AI-powered interactions.</p>
+<h2 id="%F0%9F%9A%80-features">🚀 Features</h2>
+<h3 id="%F0%9F%94%8D-comprehensive-coverity-integration">🔍 <strong>Comprehensive Coverity Integration</strong></h3>
+<ul>
+<li><strong>Project Management</strong>: List and explore Coverity projects and streams</li>
+<li><strong>Defect Analysis</strong>: Advanced defect search with intelligent filtering and detailed analysis</li>
+<li><strong>User Management</strong>: Complete user administration, role management, and access control</li>
+<li><strong>Security Focus</strong>: Specialized security vulnerability detection and analysis</li>
+<li><strong>CI/CD Automation</strong>: Automated pipeline integration for continuous quality monitoring</li>
+<li><strong>Quality Reports</strong>: Executive-level quality dashboards and trend analysis</li>
+</ul>
+<h3 id="%F0%9F%A4%96-ai-powered-analysis">🤖 <strong>AI-Powered Analysis</strong></h3>
+<ul>
+<li><strong>Natural Language Queries</strong>: &quot;Show me critical security issues in project X&quot; or &quot;List users with administrator privileges&quot;</li>
+<li><strong>Intelligent Filtering</strong>: Automatic prioritization of high-impact defects and user access management</li>
+<li><strong>Contextual Recommendations</strong>: AI-driven remediation suggestions and security audit insights</li>
+<li><strong>Trend Analysis</strong>: Historical data analysis, quality metrics, and user activity patterns</li>
+</ul>
+<h3 id="%F0%9F%9B%A0%EF%B8%8F-enterprise-ready">🛠️ <strong>Enterprise Ready</strong></h3>
+<ul>
+<li><strong>SOAP API Integration</strong>: Full Coverity Connect Web Services support</li>
+<li><strong>Authentication</strong>: Secure auth-key based authentication</li>
+<li><strong>Proxy Support</strong>: Corporate network and proxy configuration</li>
+<li><strong>Multi-Platform</strong>: Windows, macOS, and Linux support</li>
+<li><strong>Docker Ready</strong>: Containerized deployment for enterprise environments</li>
+</ul>
+<h2 id="%F0%9F%93%A6-installation">📦 Installation</h2>
+<blockquote>
+<p>⚠️ <strong>Note</strong>: This package is not yet published to PyPI or Docker Hub. Please use the source installation method until official packages are released.</p>
+</blockquote>
+<h3 id="current-installation-method-recommended">Current Installation Method (Recommended)</h3>
+<pre class="hljs"><code><div><span class="hljs-comment"># Clone the repository</span>
+git <span class="hljs-built_in">clone</span> https://github.com/keides2/coverity-connect-mcp.git
+<span class="hljs-built_in">cd</span> coverity-connect-mcp
+
+<span class="hljs-comment"># Install in development mode</span>
+pip install -e .
+</div></code></pre>
+<h3 id="alternative-direct-installation-from-github">Alternative: Direct Installation from GitHub</h3>
+<pre class="hljs"><code><div><span class="hljs-comment"># Install directly from GitHub</span>
+pip install git+https://github.com/keides2/coverity-connect-mcp.git
+</div></code></pre>
+<h3 id="future-installation-methods">Future Installation Methods</h3>
+<p>Once the package is published, these installation methods will be available:</p>
+<h4 id="pypi-installation-coming-soon">PyPI Installation (Coming Soon)</h4>
+<pre class="hljs"><code><div>pip install coverity-connect-mcp
+</div></code></pre>
+<h4 id="docker-installation-coming-soon">Docker Installation (Coming Soon)</h4>
+<pre class="hljs"><code><div>docker pull keides2/coverity-connect-mcp:latest
+</div></code></pre>
+<h3 id="development-installation">Development Installation</h3>
+<p>For development purposes:</p>
+<pre class="hljs"><code><div>git <span class="hljs-built_in">clone</span> https://github.com/keides2/coverity-connect-mcp.git
+<span class="hljs-built_in">cd</span> coverity-connect-mcp
+
+<span class="hljs-comment"># Create virtual environment</span>
+python -m venv venv
+<span class="hljs-built_in">source</span> venv/bin/activate  <span class="hljs-comment"># On Windows: venv\Scripts\activate</span>
+
+<span class="hljs-comment"># Install with development dependencies</span>
+pip install -e <span class="hljs-string">".[dev]"</span>
+</div></code></pre>
+<h2 id="%E2%9A%99%EF%B8%8F-configuration">⚙️ Configuration</h2>
+<h3 id="1-environment-variables">1. Environment Variables</h3>
+<p>Create a <code>.env</code> file or set environment variables:</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># Required - Coverity Connect Authentication</span>
+<span class="hljs-built_in">export</span> COVAUTHUSER=<span class="hljs-string">"your_coverity_username"</span>
+<span class="hljs-built_in">export</span> COVAUTHKEY=<span class="hljs-string">"your_coverity_auth_key"</span>
+
+<span class="hljs-comment"># Required - Coverity Server</span>
+<span class="hljs-built_in">export</span> COVERITY_HOST=<span class="hljs-string">"your-coverity-server.com"</span>
+<span class="hljs-built_in">export</span> COVERITY_PORT=<span class="hljs-string">"443"</span>
+<span class="hljs-built_in">export</span> COVERITY_SSL=<span class="hljs-string">"True"</span>
+
+<span class="hljs-comment"># Optional - Local Workspace</span>
+<span class="hljs-built_in">export</span> COVERITY_BASE_DIR=<span class="hljs-string">"/path/to/coverity/workspace"</span>
+
+<span class="hljs-comment"># Optional - Corporate Proxy (if needed)</span>
+<span class="hljs-built_in">export</span> PROXY_HOST=<span class="hljs-string">"your-proxy-server.com"</span>
+<span class="hljs-built_in">export</span> PROXY_PORT=<span class="hljs-string">"3128"</span>
+<span class="hljs-built_in">export</span> PROXY_USER=<span class="hljs-string">"proxy_username"</span>  <span class="hljs-comment"># if authentication required</span>
+<span class="hljs-built_in">export</span> PROXY_PASS=<span class="hljs-string">"proxy_password"</span>  <span class="hljs-comment"># if authentication required</span>
+</div></code></pre>
+<h3 id="2-claude-desktop-integration">2. Claude Desktop Integration</h3>
+<p>Add to your <code>claude_desktop_config.json</code>:</p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"mcpServers"</span>: {
+    <span class="hljs-attr">"coverity-connect"</span>: {
+      <span class="hljs-attr">"command"</span>: <span class="hljs-string">"coverity-mcp-server"</span>,
+      <span class="hljs-attr">"env"</span>: {
+        <span class="hljs-attr">"COVAUTHUSER"</span>: <span class="hljs-string">"${COVAUTHUSER}"</span>,
+        <span class="hljs-attr">"COVAUTHKEY"</span>: <span class="hljs-string">"${COVAUTHKEY}"</span>,
+        <span class="hljs-attr">"COVERITY_HOST"</span>: <span class="hljs-string">"your-coverity-server.com"</span>
+      }
+    }
+  }
+}
+</div></code></pre>
+<h3 id="3-docker-configuration">3. Docker Configuration</h3>
+<blockquote>
+<p><strong>Note</strong>: Since the Docker image is not yet published, you can build it locally:</p>
+</blockquote>
+<pre class="hljs"><code><div><span class="hljs-comment"># docker-compose.yml</span>
+<span class="hljs-attr">version:</span> <span class="hljs-string">'3.8'</span>
+<span class="hljs-attr">services:</span>
+  <span class="hljs-attr">coverity-mcp:</span>
+    <span class="hljs-attr">build:</span> <span class="hljs-string">.</span>  <span class="hljs-comment"># Build from local source</span>
+    <span class="hljs-comment"># Future: image: keides2/coverity-connect-mcp:latest</span>
+    <span class="hljs-attr">environment:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">COVAUTHUSER=${COVAUTHUSER}</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">COVAUTHKEY=${COVAUTHKEY}</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">COVERITY_HOST=${COVERITY_HOST}</span>
+      <span class="hljs-comment"># Optional proxy settings</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">PROXY_HOST=${PROXY_HOST}</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">PROXY_PORT=${PROXY_PORT}</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">"8000:8000"</span>
+</div></code></pre>
+<h2 id="%F0%9F%8E%AF-usage-examples">🎯 Usage Examples</h2>
+<h3 id="basic-project-analysis">Basic Project Analysis</h3>
+<pre class="hljs"><code><div>Show me all Coverity projects and their current status
+</div></code></pre>
+<h3 id="security-focused-analysis">Security-Focused Analysis</h3>
+<pre class="hljs"><code><div>Analyze the latest snapshot of project &quot;MyWebApp&quot; and focus on high-severity security vulnerabilities. Provide specific remediation recommendations.
+</div></code></pre>
+<h3 id="quality-reporting">Quality Reporting</h3>
+<pre class="hljs"><code><div>Generate a comprehensive quality report for project &quot;MyProject&quot; including trends over the last 30 days
+</div></code></pre>
+<h3 id="cicd-integration">CI/CD Integration</h3>
+<pre class="hljs"><code><div>Run automated Coverity analysis for group &quot;web-team&quot;, project &quot;frontend&quot;, branch &quot;main&quot; with commit message &quot;Security fixes&quot;
+</div></code></pre>
+<h3 id="advanced-filtering">Advanced Filtering</h3>
+<pre class="hljs"><code><div>Show me all CERT-C violations in project &quot;EmbeddedSystem&quot; with impact level &quot;High&quot; and provide code examples for fixes
+</div></code></pre>
+<h3 id="user-management--security-audit">User Management &amp; Security Audit</h3>
+<pre class="hljs"><code><div>List all users with administrator privileges and show their last login times
+</div></code></pre>
+<h3 id="role-based-access-control">Role-Based Access Control</h3>
+<pre class="hljs"><code><div>Show me the permissions and role assignments for user &quot;developer1&quot; and identify any security concerns
+</div></code></pre>
+<h2 id="%F0%9F%9B%A0%EF%B8%8F-available-tools">🛠️ Available Tools</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Description</th>
+<th>Example Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>search_defects</code></td>
+<td>Advanced defect search with filtering</td>
+<td>Find high-severity security vulnerabilities</td>
+</tr>
+<tr>
+<td><code>get_defect_details</code></td>
+<td>Get detailed information about a specific defect</td>
+<td>Analyze defect events and remediation steps</td>
+</tr>
+<tr>
+<td><code>list_projects</code></td>
+<td>List all accessible Coverity projects</td>
+<td>Project inventory and access verification</td>
+</tr>
+<tr>
+<td><code>list_streams</code></td>
+<td>Get streams for a specific project</td>
+<td>Stream-based analysis planning</td>
+</tr>
+<tr>
+<td><code>get_project_summary</code></td>
+<td>Get comprehensive project analysis</td>
+<td>Executive project health reports</td>
+</tr>
+<tr>
+<td><code>list_users</code></td>
+<td>🆕 List all users in Coverity Connect</td>
+<td>User inventory and access management</td>
+</tr>
+<tr>
+<td><code>get_user_details</code></td>
+<td>🆕 Get detailed information about a user</td>
+<td>User profile and account status verification</td>
+</tr>
+<tr>
+<td><code>get_user_roles</code></td>
+<td>🆕 Get user role and permission information</td>
+<td>Security audit and access control review</td>
+</tr>
+</tbody>
+</table>
+<h2 id="%F0%9F%93%9A-documentation">📚 Documentation</h2>
+<h3 id="%F0%9F%9A%80-quick-start">🚀 Quick Start</h3>
+<ul>
+<li><strong><a href="docs/GETTING_STARTED.md">Getting Started Guide</a></strong> - 📋 Complete setup guide for production environments</li>
+<li><strong><a href="SETUP_GUIDE.md">Setup Guide</a></strong> - Complete development to production setup</li>
+</ul>
+<h3 id="english">English</h3>
+<ul>
+<li><strong><a href="docs/installation.md">Installation Guide</a></strong> - Detailed setup instructions for all platforms</li>
+<li><strong><a href="docs/configuration.md">Configuration Reference</a></strong> - Complete configuration options and security settings</li>
+<li><strong><a href="docs/api.md">API Reference</a></strong> - Comprehensive API documentation with examples</li>
+<li><strong><a href="examples/">Usage Examples</a></strong> - Environment-specific configurations and examples</li>
+</ul>
+<h3 id="%E6%97%A5%E6%9C%AC%E8%AA%9E-japanese">日本語 (Japanese)</h3>
+<ul>
+<li><strong><a href="docs/GETTING_STARTED.md">本番環境セットアップガイド</a></strong> - 📋 本番環境での完全な立ち上げ手順</li>
+<li><strong><a href="docs/ja/installation.md">インストールガイド</a></strong> - 詳細なセットアップ手順（全プラットフォーム対応）</li>
+<li><strong><a href="docs/ja/configuration.md">設定リファレンス</a></strong> - 完全な設定オプションとセキュリティ設定</li>
+<li><strong><a href="docs/ja/api.md">API リファレンス</a></strong> - 包括的なAPI仕様書と使用例</li>
+<li><strong><a href="examples/">使用例</a></strong> - 環境別設定とサンプル</li>
+</ul>
+<blockquote>
+<p>🌐 <strong>多言語サポート</strong>: 英語と日本語の完全ドキュメントを提供しています。すべてのガイドにはステップバイステップの手順、トラブルシューティングのヒント、実用的な例が含まれています。</p>
+</blockquote>
+<h2 id="%F0%9F%A7%AA-testing">🧪 Testing</h2>
+<pre class="hljs"><code><div><span class="hljs-comment"># Run unit tests</span>
+pytest tests/
+
+<span class="hljs-comment"># Run integration tests</span>
+pytest tests/ -m integration
+
+<span class="hljs-comment"># Run with coverage</span>
+pytest --cov=coverity_mcp_server tests/
+
+<span class="hljs-comment"># Test with Docker</span>
+docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+</div></code></pre>
+<h2 id="%F0%9F%A4%9D-contributing">🤝 Contributing</h2>
+<p>We welcome contributions! Please see our <a href="CONTRIBUTING.md">Contributing Guide</a> for details.</p>
+<h3 id="development-setup">Development Setup</h3>
+<pre class="hljs"><code><div>git <span class="hljs-built_in">clone</span> https://github.com/keides2/coverity-connect-mcp.git
+<span class="hljs-built_in">cd</span> coverity-connect-mcp
+python -m venv venv
+<span class="hljs-built_in">source</span> venv/bin/activate  <span class="hljs-comment"># On Windows: venv\Scripts\activate</span>
+pip install -e <span class="hljs-string">".[dev]"</span>
+pre-commit install
+</div></code></pre>
+<h3 id="submitting-changes">Submitting Changes</h3>
+<ol>
+<li>Fork the repository</li>
+<li>Create a feature branch (<code>git checkout -b feature/amazing-feature</code>)</li>
+<li>Commit your changes (<code>git commit -m 'Add amazing feature'</code>)</li>
+<li>Push to the branch (<code>git push origin feature/amazing-feature</code>)</li>
+<li>Open a Pull Request</li>
+</ol>
+<h2 id="%F0%9F%93%84-license">📄 License</h2>
+<p>This project is licensed under the MIT License - see the <a href="LICENSE">LICENSE</a> file for details.</p>
+<h2 id="%F0%9F%99%8F-acknowledgments">🙏 Acknowledgments</h2>
+<ul>
+<li><strong>Black Duck Coverity</strong> for providing the static analysis platform</li>
+<li><strong>Anthropic</strong> for the Model Context Protocol and Claude AI</li>
+<li><strong>Open Source Community</strong> for the foundational libraries and tools</li>
+</ul>
+<h2 id="%F0%9F%93%9E-support">📞 Support</h2>
+<ul>
+<li><strong>GitHub Issues</strong>: <a href="https://github.com/keides2/coverity-connect-mcp/issues">Report bugs or request features</a></li>
+<li><strong>Discussions</strong>: <a href="https://github.com/keides2/coverity-connect-mcp/discussions">Community support and questions</a></li>
+<li><strong>Security Issues</strong>: Please see our <a href="SECURITY.md">Security Policy</a></li>
+</ul>
+<h2 id="%F0%9F%97%BA%EF%B8%8F-roadmap">🗺️ Roadmap</h2>
+<ul>
+<li><input type="checkbox" id="checkbox0" checked="true"><label for="checkbox0"></label><strong>v1.0</strong>: Complete MCP implementation with user management ✨</li>
+<li><input type="checkbox" id="checkbox1"><label for="checkbox1"></label><strong>v1.1</strong>: Advanced filtering, custom views, and analytics dashboards</li>
+<li><input type="checkbox" id="checkbox2"><label for="checkbox2"></label><strong>v1.2</strong>: Multi-tenant support and enhanced user administration</li>
+<li><input type="checkbox" id="checkbox3"><label for="checkbox3"></label><strong>v1.3</strong>: GraphQL API and real-time notifications</li>
+<li><input type="checkbox" id="checkbox4"><label for="checkbox4"></label><strong>v1.4</strong>: Machine learning-powered defect prioritization and risk assessment</li>
+<li><input type="checkbox" id="checkbox5"><label for="checkbox5"></label><strong>v2.0</strong>: Plugin architecture and third-party integrations</li>
+</ul>
+<hr>
+<p><strong>Made with ❤️ for the software security community</strong></p>
+<p><em>Transform your static analysis workflow with the power of AI</em></p>
+
+</body>
+</html>
