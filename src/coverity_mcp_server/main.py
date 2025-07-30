@@ -62,7 +62,7 @@ def initialize_client() -> CoverityClient:
     
     # Debug: Print working directory and expected vs actual values
     logger.info(f"Current working directory: {os.getcwd()}")
-    logger.info(f"Expected COVERITY_HOST: https://sast.kbit-repo.net/")
+    logger.info("Expected COVERITY_HOST: https://sast.kbit-repo.net/")
     logger.info(f"Actual COVERITY_HOST: {repr(coverity_url)}")
     
     """何かが環境変数を再度変更するので環境変数に依存せず、直接値を設定する
@@ -73,13 +73,12 @@ def initialize_client() -> CoverityClient:
     os.environ['COVERITY_SSL'] = 'true'
     os.environ['COVERITY_PORT'] = '443'
     
-    logger.info("=== FORCE OVERRIDE: Environment variables set manually ====")
-    """
-    
     # DIRECT ASSIGNMENT - bypass os.getenv() entirely
+    logger.info("=== FORCE OVERRIDE: Environment variables set manually ====")
     coverity_url = 'https://sast.kbit-repo.net'
-    username = 'shimatani'
-    password = 'coverity'
+    username = 'username'
+    password = 'password'
+    """
 
     logger.info("=== DIRECT ASSIGNMENT: Using hardcoded values ===")
     logger.info(f"Direct COVERITY_HOST: {repr(coverity_url)}")
@@ -88,8 +87,8 @@ def initialize_client() -> CoverityClient:
 
     # Debug: Check if environment variable was set correctly
     if coverity_url != "https://sast.kbit-repo.net/":
-        logger.error(f"❌ ENVIRONMENT VARIABLE MISMATCH!")
-        logger.error(f"Expected: https://sast.kbit-repo.net/")
+        logger.error("❌ ENVIRONMENT VARIABLE MISMATCH!")
+        logger.error("Expected: https://sast.kbit-repo.net/")
         logger.error(f"Actual: {repr(coverity_url)}")
         logger.error("MCP server is reading wrong configuration!")
     
