@@ -117,8 +117,10 @@ def initialize_client() -> CoverityClient:
         username = "dummy_user"
     
     if not password:
-        logger.warning("COVAUTHKEY not set, using default dummy_key")
-        password = "dummy_key"
+        raise ValueError(
+            "COVAUTHKEY environment variable is required. "
+            "Please set your Coverity authentication key."
+        )
     
     # Parse URL to extract host, port, and SSL setting
     try:
