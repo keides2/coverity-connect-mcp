@@ -1,0 +1,39 @@
+name: Security Check Only
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  bandit-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install only bandit
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit
+    
+    - name: Run Bandit security scan
+      run: |
+        echo "Running bandit security scan..."
+        bandit -r src/ --severity-level medium --format json --output bandit-results.json || true
+        echo "Bandit scan results:"
+        bandit -r src/ --severity-level medium
+    
+    - name: Upload Bandit results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: bandit-security-results
+        path: bandit-results.json
