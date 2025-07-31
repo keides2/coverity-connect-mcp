@@ -5,7 +5,7 @@
 <!-- [![PyPI version](https://badge.fury.io/py/coverity-connect-mcp.svg)](https://badge.fury.io/py/coverity-connect-mcp) -->
 <!-- [![Python Support](https://img.shields.io/pypi/pyversions/coverity-connect-mcp.svg)](https://pypi.org/project/coverity-connect-mcp/) -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://github.com/keides2/coverity-connect-mcp/workflows/Tests/badge.svg)](https://github.com/keides2/coverity-connect-mcp/actions)
+[![Security Check](https://github.com/keides2/coverity-connect-mcp/workflows/Security%20Check%20Only/badge.svg)](https://github.com/keides2/coverity-connect-mcp/actions)
 [![Coverage](https://codecov.io/gh/keides2/coverity-connect-mcp/branch/main/graph/badge.svg)](https://codecov.io/gh/keides2/coverity-connect-mcp)
 
 **English** | [日本語](README_ja.md)
