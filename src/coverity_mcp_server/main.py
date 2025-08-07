@@ -9,15 +9,26 @@ import sys
 import logging
 from typing import List, Dict, Any, Optional
 from urllib.parse import urlparse
+from pathlib import Path
 
 import click
 from mcp.server.fastmcp import FastMCP
+
+# .envファイルを読み込む（重要：最初に実行）
+try:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).parent.parent.parent / '.env'
+    if env_path.exists():
+        load_dotenv(env_path)
+        # Windows環境対応: Unicode文字を使わない
+        print(f"[OK] Loaded .env from {env_path}")
+except ImportError:
+    pass  # python-dotenvがない場合は環境変数を使用
 
 from .coverity_client import CoverityClient
 
 # Configure logging
 import tempfile
-from pathlib import Path
 
 # Set log file to project directory
 project_root = Path(__file__).parent.parent.parent
@@ -43,129 +54,128 @@ def initialize_client() -> CoverityClient:
     """Initialize Coverity client with environment variables"""
     global coverity_client
     
-    # Force re-initialization for debugging (remove this in production)
-    coverity_client = None
-    
+    # 既存のクライアントがあれば再利用
     if coverity_client is not None:
+        logger.info("Using existing Coverity client instance")
         return coverity_client
     
-    # Get configuration from environment variables
-    coverity_url = os.getenv('COVERITY_HOST')
-    username = os.getenv('COVAUTHUSER')
-    password = os.getenv('COVAUTHKEY')
+    # 環境変数から設定を取得
+    coverity_url = os.getenv('COVERITY_HOST', '').strip()
+    username = os.getenv('COVAUTHUSER', '').strip()
+    password = os.getenv('COVAUTHKEY', '').strip()
     
-    # Debug: Print ALL environment variables for COVERITY
-    logger.info("=== DEBUG: Environment Variables Analysis ===")
-    logger.info(f"Raw os.getenv('COVERITY_HOST'): {repr(coverity_url)}")
-    logger.info(f"Raw os.getenv('COVAUTHUSER'): {repr(username)}")
-    logger.info(f"Raw os.getenv('COVAUTHKEY'): {repr(password)}")
+    # プロキシ設定を取得（.envファイルから）
+    proxy_host = os.getenv('PROXY_HOST', 'bypsproxy.daikin.co.jp').strip()
+    proxy_port = os.getenv('PROXY_PORT', '3128').strip()
     
-    # Debug: Print working directory and expected vs actual values
-    logger.info(f"Current working directory: {os.getcwd()}")
-    logger.info("Expected COVERITY_HOST: https://sast.kbit-repo.net/")
-    logger.info(f"Actual COVERITY_HOST: {repr(coverity_url)}")
+    # プロキシを環境変数に設定（aiohttpが使用）
+    if proxy_host and proxy_port:
+        proxy_url = f"http://{proxy_host}:{proxy_port}"
+        os.environ['HTTP_PROXY'] = proxy_url
+        os.environ['HTTPS_PROXY'] = proxy_url
+        os.environ['http_proxy'] = proxy_url
+        os.environ['https_proxy'] = proxy_url
+        logger.info(f"Proxy configured: {proxy_url}")
     
-    """何かが環境変数を再度変更するので環境変数に依存せず、直接値を設定する
-    # Force correct environment variables (override any existing values)
-    os.environ['COVERITY_HOST'] = 'https://sast.kbit-repo.net'
-    os.environ['PROXY_HOST'] = 'bypsproxy.daikin.co.jp'
-    os.environ['PROXY_PORT'] = '3128'
-    os.environ['COVERITY_SSL'] = 'true'
-    os.environ['COVERITY_PORT'] = '443'
+    # デバッグ情報の出力（パスワードは隠す）
+    logger.info("=== Coverity Client Initialization ===")
+    logger.info(f"COVERITY_HOST: {coverity_url}")
+    logger.info(f"COVAUTHUSER: {username}")
+    logger.info(f"COVAUTHKEY: {'*' * 8 if password else 'NOT SET'}")
+    logger.info(f"Proxy: {proxy_host}:{proxy_port}")
+    logger.info(f"Working Directory: {os.getcwd()}")
     
-    # DIRECT ASSIGNMENT - bypass os.getenv() entirely
-    logger.info("=== FORCE OVERRIDE: Environment variables set manually ====")
-    coverity_url = 'https://sast.kbit-repo.net'
-    username = 'username'
-    password = 'password'
-    """
-
-    logger.info("=== DIRECT ASSIGNMENT: Using hardcoded values ===")
-    logger.info(f"Direct COVERITY_HOST: {repr(coverity_url)}")
-    logger.info(f"Direct COVAUTHUSER: {repr(username)}")
-    logger.info(f"Direct COVAUTHKEY: {'***' if password else 'None'}")
-
-    # Debug: Check if environment variable was set correctly
-    if coverity_url != "https://sast.kbit-repo.net/":
-        logger.error("❌ ENVIRONMENT VARIABLE MISMATCH!")
-        logger.error("Expected: https://sast.kbit-repo.net/")
-        logger.error(f"Actual: {repr(coverity_url)}")
-        logger.error("MCP server is reading wrong configuration!")
-    
-    # Debug: Print all environment variables that contain COVERITY
-    for key, value in os.environ.items():
-        if 'COVERITY' in key.upper():
-            logger.info(f"Environment variable {key}: {repr(value)}")
-    
-    # Debug: Print environment variables (without password)
-    logger.info(f"Environment variables - COVERITY_HOST: {coverity_url}")
-    logger.info(f"Environment variables - COVAUTHUSER: {username}")
-    logger.info(f"Environment variables - COVAUTHKEY: {'***' if password else 'None'}")
-    
-    # Handle missing configuration gracefully
-    logger.info("=== DEBUG: Configuration Processing ===")
+    # 必須パラメータのチェック
     if not coverity_url:
-        logger.warning("COVERITY_HOST not set, using default localhost")
-        logger.info(f"BEFORE: coverity_url = {repr(coverity_url)}")
-        coverity_url = "http://localhost:8080"
-        logger.info(f"AFTER: coverity_url = {repr(coverity_url)}")
-    else:
-        logger.info(f"COVERITY_HOST is set: {repr(coverity_url)}")
+        logger.error("COVERITY_HOST environment variable is missing")
+        raise ValueError(
+            "COVERITY_HOST environment variable is required. "
+            "Please set it in your .env file or environment."
+        )
     
     if not username:
-        logger.warning("COVAUTHUSER not set, using default dummy_user")
-        username = "dummy_user"
+        logger.error("COVAUTHUSER environment variable is missing")
+        raise ValueError(
+            "COVAUTHUSER environment variable is required. "
+            "Please set your Coverity username."
+        )
     
     if not password:
-        if os.getenv('TESTING') != 'true':
-            raise ValueError(
-                "COVAUTHKEY environment variable is required. "
-                "Please set your Coverity authentication key."
-            )
-        password = "test_key"  # nosec B105
-
-    # Parse URL to extract host, port, and SSL setting
+        logger.error("COVAUTHKEY environment variable is missing")
+        raise ValueError(
+            "COVAUTHKEY environment variable is required. "
+            "Please set your Coverity authentication key."
+        )
+    
+    # URLを正規化（末尾のスラッシュを削除）
+    coverity_url = coverity_url.rstrip('/')
+    
+    # URLをパースして設定を抽出
     try:
+        # URLに適切なスキームがない場合は追加
+        if not coverity_url.startswith(('http://', 'https://')):
+            logger.warning(f"No scheme in URL: {coverity_url}, assuming https://")
+            coverity_url = f"https://{coverity_url}"
+        
         parsed_url = urlparse(coverity_url)
         
-        # Extract host (remove trailing slash if present)
-        host = parsed_url.hostname or parsed_url.netloc.split(':')[0]
-        
-        # Handle cases where hostname is still empty
+        # ホスト名の抽出
+        host = parsed_url.hostname
         if not host:
-            logger.warning(f"Could not parse hostname from URL: {coverity_url}, using localhost")
-            host = "localhost"
+            # hostnameが取得できない場合はnetlocから取得
+            host = parsed_url.netloc.split(':')[0]
         
-        # Extract port
+        if not host:
+            raise ValueError(f"Cannot extract hostname from URL: {coverity_url}")
+        
+        # ポート番号の抽出（テスト成功時と同じ設定）
         if parsed_url.port:
             port = parsed_url.port
         elif parsed_url.scheme == 'https':
-            port = 443
+            port = 443  # HTTPS標準ポート
         else:
-            port = 8080
+            port = 8080  # Coverity Connect標準ポート
         
-        # Determine SSL setting
+        # SSL設定の判定
         use_ssl = parsed_url.scheme == 'https'
         
-        logger.info(f"Parsed URL - Host: {host}, Port: {port}, SSL: {use_ssl}")
+        logger.info(f"Parsed configuration:")
+        logger.info(f"  Host: {host}")
+        logger.info(f"  Port: {port}")
+        logger.info(f"  SSL: {use_ssl}")
+        logger.info(f"  Full URL: {parsed_url.scheme}://{host}:{port}")
         
     except Exception as e:
         logger.error(f"Error parsing URL {coverity_url}: {e}")
-        logger.info("Using default values: localhost:8080, SSL=False")
-        host = "localhost"
-        port = 8080
-        use_ssl = False
+        raise ValueError(f"Invalid COVERITY_HOST URL: {coverity_url}")
     
-    coverity_client = CoverityClient(
-        host=host,
-        port=port,
-        use_ssl=use_ssl,
-        username=username,
-        password=password
-    )
-    
-    logger.info(f"Initialized Coverity client for {host}:{port} (SSL: {use_ssl})")
-    return coverity_client
+    # Coverityクライアントの作成
+    try:
+        coverity_client = CoverityClient(
+            host=host,
+            port=port,
+            use_ssl=use_ssl,
+            username=username,
+            password=password
+        )
+        
+        # Windows環境対応: Unicode文字を使わない
+        logger.info(f"[OK] Successfully initialized Coverity client")
+        logger.info(f"  Server: {host}:{port}")
+        logger.info(f"  User: {username}")
+        logger.info(f"  SSL: {use_ssl}")
+        logger.info(f"  Proxy: {proxy_url if proxy_host else 'None'}")
+        
+        return coverity_client
+        
+    except Exception as e:
+        logger.error(f"Failed to create Coverity client: {e}")
+        logger.error("Please check:")
+        logger.error("  1. Network connectivity to Coverity server")
+        logger.error("  2. Proxy settings (if behind corporate firewall)")
+        logger.error("  3. Authentication credentials")
+        logger.error("  4. Server URL and port")
+        raise
 
 def create_server() -> FastMCP:
     """Create and configure the MCP server"""
