@@ -257,3 +257,7 @@ dxt-*/
 __pycache__/
 *.log
 temp-*/
+
+dist/
+build/
+*.egg-info/
