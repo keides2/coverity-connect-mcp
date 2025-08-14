@@ -252,3 +252,8 @@ evac/
 test/
 *_test_result.txt
 *_actual.md
+
+dxt-*/
+__pycache__/
+*.log
+temp-*/
