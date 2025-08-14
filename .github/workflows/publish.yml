@@ -1,4 +1,4 @@
-﻿name: Publish to GitHub Packages
+name: Publish to GitHub Packages
 
 on:
   release:
@@ -29,9 +29,9 @@ jobs:
     - name: Build package
       run: python -m build
     
-    - name: Publish to PyPI (for now)
+    - name: Publish to GitHub Packages
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+        twine upload --repository-url https://pypi.pkg.github.com/keides2/ dist/*
