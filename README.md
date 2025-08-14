@@ -39,39 +39,35 @@ Transform your Coverity workflow with natural language commands and automated an
 
 ## 📦 Installation
 
-> ⚠️ **Note**: This package is not yet published to PyPI or Docker Hub. Please use the source installation method until official packages are released.
+### 🎯 **Claude Desktop Integration (Recommended)**
 
-### Current Installation Method (Recommended)
+For Claude Desktop users, download the DXT package from the latest release:
+
+1. **Download DXT Package**:
+   - Go to [Releases](https://github.com/keides2/coverity-connect-mcp/releases)
+   - Download `coverity-connect-mcp-1.0.0.dxt` from the latest release
+
+2. **Install in Claude Desktop**:
+   - Drag and drop the `.dxt` file into Claude Desktop
+   - Configure environment variables (see Configuration section)
+
+### 🐍 **Python Package Installation**
+
+#### Direct Installation from GitHub
 ```bash
-# Clone the repository
+# Install directly from GitHub (recommended)
+pip install git+https://github.com/keides2/coverity-connect-mcp.git
+```
+### Source Installation
+
+```bash
+# Clone and install from source
 git clone https://github.com/keides2/coverity-connect-mcp.git
 cd coverity-connect-mcp
-
-# Install in development mode
 pip install -e .
 ```
 
-### Alternative: Direct Installation from GitHub
-```bash
-# Install directly from GitHub
-pip install git+https://github.com/keides2/coverity-connect-mcp.git
-```
-
-### Future Installation Methods
-
-Once the package is published, these installation methods will be available:
-
-#### PyPI Installation (Coming Soon)
-```bash
-pip install coverity-connect-mcp
-```
-
-#### Docker Installation (Coming Soon)
-```bash
-docker pull keides2/coverity-connect-mcp:latest
-```
-
-### Development Installation
+### 🔧 Development Installation
 
 For development purposes:
 
@@ -87,6 +83,20 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e ".[dev]"
 ```
 
+### 🚀 Future Installation Methods
+These installation methods are planned for future releases:
+
+#### PyPI Installation (Planned)
+
+```bash
+pip install coverity-connect-mcp
+```
+
+#### Docker Installation (Planned)
+
+```bash
+docker pull keides2/coverity-connect-mcp:latest
+```
 ## ⚙️ Configuration
 
 ### 1. Environment Variables
