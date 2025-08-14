@@ -29,9 +29,18 @@ jobs:
     - name: Build package
       run: python -m build
     
-    - name: Publish to GitHub Packages
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create .pypirc for GitHub Packages
       run: |
-        twine upload --repository-url https://pypi.pkg.github.com/ dist/*
+        cat > ~/.pypirc << EOF
+        [distutils]
+        index-servers = github
+        
+        [github]
+        repository = https://pypi.pkg.github.com/
+        username = __token__
+        password = ${{ secrets.GITHUB_TOKEN }}
+        EOF
+    
+    - name: Publish to GitHub Packages
+      run: |
+        twine upload --repository github dist/*
