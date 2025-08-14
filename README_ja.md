@@ -39,39 +39,36 @@ AIアシスタント（Claude Desktopなど）と**Black Duck Coverity Connect**
 
 ## 📦 インストール
 
-> ⚠️ **注意**: このパッケージはまだPyPIやDocker Hubに公開されていません。公式パッケージがリリースされるまでは、ソースからのインストール方法をご利用ください。
+### 🎯 **Claude Desktopとの統合（推奨）**
 
-### 現在のインストール方法（推奨）
+Claude Desktopユーザーは、最新リリースからDXTパッケージをダウンロードしてください：
+
+1. **DXTパッケージのダウンロード**:
+   - [Releases](https://github.com/keides2/coverity-connect-mcp/releases)にアクセス
+   - 最新リリースから`coverity-connect-mcp-1.0.0.dxt`をダウンロード
+
+2. **Claude Desktopにインストール**:
+   - `.dxt`ファイルをClaude Desktopにドラッグ＆ドロップ
+   - 環境変数を設定（設定セクションを参照）
+
+### 🐍 **Pythonパッケージインストール**
+
+#### GitHubから直接インストール
 ```bash
-# リポジトリをクローン
-git clone https://github.com/keides2/coverity-connect-mcp.git
-cd coverity-connect-mcp
-
-# 開発モードでインストール
-pip install -e .
-```
-
-### 代替方法: GitHubから直接インストール
-```bash
-# GitHubから直接インストール
+# GitHubから直接インストール（推奨）
 pip install git+https://github.com/keides2/coverity-connect-mcp.git
 ```
 
-### 今後のインストール方法
+#### ソースからのインストール
 
-パッケージが公開されると、以下のインストール方法が利用可能になります：
-
-#### PyPIからのインストール（近日公開予定）
 ```bash
-pip install coverity-connect-mcp
+# ソースからクローン＆インストール
+git clone https://github.com/keides2/coverity-connect-mcp.git
+cd coverity-connect-mcp
+pip install -e .
 ```
 
-#### Dockerでのインストール（近日公開予定）
-```bash
-docker pull keides2/coverity-connect-mcp:latest
-```
-
-### 開発用インストール
+## 🔧 開発用インストール
 
 開発目的の場合：
 
@@ -85,6 +82,22 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # 開発依存関係と一緒にインストール
 pip install -e ".[dev]"
+```
+
+## 🚀 今後のインストール方法
+
+以下のインストール方法は今後のリリースで計画されています：
+
+### PyPIからのインストール（計画中）
+
+```bash
+pip install coverity-connect-mcp
+```
+
+### Dockerでのインストール（計画中）
+
+```bash
+docker pull keides2/coverity-connect-mcp:latest
 ```
 
 ## ⚙️ 設定
