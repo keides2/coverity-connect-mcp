@@ -1,3 +1,5 @@
+[![MSeeP.ai Security Assessment Badge](https://mseep.net/pr/keides2-coverity-connect-mcp-badge.png)](https://mseep.ai/app/keides2-coverity-connect-mcp)
+
 # Coverity Connect MCP Server
 
 <img src="top.png" alt="Coverity Connect MCP Server" width="700">
